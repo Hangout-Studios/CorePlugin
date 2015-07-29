@@ -24,11 +24,10 @@ public class MenuListener implements Listener {
 	
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
-		String title = e.getInventory().getTitle();
-		MenuInventory menu = MenuManager.getMenu(title);
+		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getPlayer());
+		MenuInventory menu = p.getOpenMenu();
 		
 		if(menu != null){
-			HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getPlayer());
 			p.setOpenMenu(null);
 			
 			if(menu.isTemporary()){

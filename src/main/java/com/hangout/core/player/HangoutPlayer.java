@@ -3,6 +3,7 @@ package com.hangout.core.player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import mkremins.fanciful.FancyMessage;
@@ -16,6 +17,7 @@ import com.hangout.core.HangoutAPI;
 import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.menu.MenuInventory;
 import com.hangout.core.utils.database.Database;
+import com.hangout.core.utils.mc.CommandPreparer;
 
 public class HangoutPlayer {
 	
@@ -39,6 +41,8 @@ public class HangoutPlayer {
 	private List<UUID> mutedPlayers = new ArrayList<UUID>();
 	private boolean pvpEnabled = false;
 	private int gold = 0;
+	private HashMap<String, CommandPreparer> commands = new HashMap<String, CommandPreparer>();
+	private HashMap<String, Integer> commandKeys = new HashMap<String, Integer>();
 	
 	private MenuInventory openMenu = null;
 	
@@ -111,18 +115,38 @@ public class HangoutPlayer {
 		tooltipDescription = desc;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public FancyMessage getClickableName(HangoutPlayer toPlayer, boolean addChatTag){
 		FancyMessage message = new FancyMessage("");
 		
 		if(addChatTag){
 			message.then(getChatChannel().getTag() + " ");
 		}
+		
+		HashMap<String, Object> nameConfig =  getClickableNameConfig(toPlayer);
+		
 		return message
-			.then(getDisplayName())
-				.color(ChatColor.GOLD)
-				.style(ChatColor.ITALIC, ChatColor.BOLD)
-				.command("/text player " + getName() + " " + toPlayer.getName())
-			.tooltip(getDescription());
+			.then((String)nameConfig.get("text"))
+				.color((ChatColor)nameConfig.get("color"))
+				.style((ChatColor[])nameConfig.get("styles"))
+				.command((String)nameConfig.get("command"))
+			.tooltip((List<String>)nameConfig.get("tooltip"));
+	}
+	
+	public HashMap<String, Object> getClickableNameConfig(HangoutPlayer toPlayer){
+		HashMap<String, Object> h = new HashMap<String, Object>();
+		
+		ChatColor[] styles = new ChatColor[2];
+		styles[0] = ChatColor.ITALIC;
+		styles[1] = ChatColor.BOLD;
+		
+		h.put("text", getDisplayName());
+		h.put("color", ChatColor.GOLD);
+		h.put("styles", styles);
+		h.put("command", "/text player " + getName() + " " + toPlayer.getName());
+		h.put("tooltip", getDescription());
+		return h;
+		
 	}
 	
 	public DateTime getLastOnline(){
@@ -365,6 +389,42 @@ public class HangoutPlayer {
 	
 	public int getCurrency(){
 		return gold;
+	}
+	
+	public CommandPreparer createCommandPreparer(String tag){
+		CommandPreparer command = new CommandPreparer(this, tag, generateNewCommandKey(tag));
+		commands.put(tag, command);
+		return command;
+	}
+	
+	public CommandPreparer getCommandPreparer(String tag){
+		if(commands.containsKey(tag)){
+			return commands.get(tag);
+		}
+		return null;
+	}
+	
+	public void clearComandPreparer(String tag){
+		if(commands.containsKey(tag)){
+			commands.remove(tag);
+		}
+		
+		if(commandKeys.containsKey(tag)){
+			commandKeys.remove(tag);
+		}
+	}
+	
+	public int generateNewCommandKey(String tag){
+		int commandKey = new Random().nextInt(100000);
+		commandKeys.put(tag, commandKey);
+		return commandKey;
+	}
+	
+	public int getCommandKey(String tag){
+		if(commandKeys.containsKey(tag)){
+			return commandKeys.get(tag);
+		}
+		return -1;
 	}
 	
 	public void attemptRemove(){
