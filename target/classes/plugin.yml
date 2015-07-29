@@ -1,0 +1,19 @@
+name: CorePlugin
+main: com.hangout.core.Plugin
+version: 1.0
+commands:
+  text:
+    description: Commands that are used with clickable text
+    usage: "/text"
+  admin:
+    description: Commands for administrative purposes
+    usage: "/admin help"
+  report:
+    description: Commands for reporting faulty behaviour
+    usage: "/report help"
+  mute:
+    description: Commands for muting a player
+    usage: "/mute <player>"
+  unmute:
+    description: Commands for unmuting a player
+    usage: "/unmute <player>"

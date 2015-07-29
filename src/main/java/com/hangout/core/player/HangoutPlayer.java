@@ -1,0 +1,386 @@
+package com.hangout.core.player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import mkremins.fanciful.FancyMessage;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.joda.time.DateTime;
+
+import com.hangout.core.HangoutAPI;
+import com.hangout.core.chat.ChatChannel;
+import com.hangout.core.menu.MenuInventory;
+import com.hangout.core.utils.database.Database;
+
+public class HangoutPlayer {
+	
+	public static enum PlayerState{
+		LOADING,
+		UNLINKED,
+		COMPLETED,
+		DISCONNECTING
+	}
+	
+	private Player p;
+	private UUID id;
+	private String name;
+	private List<HangoutPlayer> friends = new ArrayList<HangoutPlayer>();
+	private List<String> tooltipDescription = new ArrayList<String>();
+	private DateTime lastOnline = DateTime.now();
+	private PlayerState playerState = PlayerState.LOADING;
+	private ViolationReport violations = new ViolationReport();
+	private List<PlayerRank> ranks = new ArrayList<PlayerRank>();
+	private ChatChannel channel = ChatChannel.SAY;
+	private List<UUID> mutedPlayers = new ArrayList<UUID>();
+	private boolean pvpEnabled = false;
+	private int gold = 0;
+	
+	private MenuInventory openMenu = null;
+	
+	private HashMap<String, Boolean> loadingProgress = new HashMap<String, Boolean>();
+	
+	public HangoutPlayer(Player p){
+		this.p = p;
+		id = p.getUniqueId();
+		name = p.getName();
+	}
+	
+	public HangoutPlayer(UUID id, String name){
+		this.id = id;
+		this.name = name;
+	}
+	
+	public Player getPlayer(){
+		if(p.isOnline()){
+			return p;
+		}
+		return null;
+	}
+	
+	public void setPlayer(Player p){
+		this.p = p;
+	}
+	
+	public UUID getUUID(){
+		return id;
+	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	public String getDisplayName(){
+		return ChatColor.RED + getName();
+	}
+	
+	public void setOpenMenu(MenuInventory menu){
+		openMenu = menu;
+	}
+	
+	public MenuInventory getOpenMenu(){
+		return openMenu;
+	}
+	
+	public boolean isInMenu(){
+		return getOpenMenu() != null;
+	}
+	
+	public boolean isOnline(){
+		if(p == null || !p.isOnline() || getPlayerState() != PlayerState.COMPLETED) return false;
+		return true;
+	}
+	
+	public void setPlayerState(PlayerState state){
+		playerState = state;
+	}
+	
+	public PlayerState getPlayerState(){
+		return playerState;
+	}
+	
+	public List<String> getDescription(){
+		return tooltipDescription;
+	}
+	
+	public void setDescription(List<String> desc){
+		tooltipDescription = desc;
+	}
+	
+	public FancyMessage getClickableName(HangoutPlayer toPlayer, boolean addChatTag){
+		FancyMessage message = new FancyMessage("");
+		
+		if(addChatTag){
+			message.then(getChatChannel().getTag() + " ");
+		}
+		return message
+			.then(getDisplayName())
+				.color(ChatColor.GOLD)
+				.style(ChatColor.ITALIC, ChatColor.BOLD)
+				.command("/text player " + getName() + " " + toPlayer.getName())
+			.tooltip(getDescription());
+	}
+	
+	public DateTime getLastOnline(){
+		if(isOnline()){
+			return DateTime.now();
+		}
+		return lastOnline;
+	}
+	
+	public void setLastOnline(DateTime time){
+		lastOnline = time;
+	}
+	
+	public boolean isReadyLoading(){
+		if(loadingProgress.isEmpty()) return false;
+		
+		for(String s : loadingProgress.keySet()){
+			if(loadingProgress.get(s) == false) return false;
+		}
+		return true;
+	}
+	public void setLoadingState(String plugin, boolean ready){
+		loadingProgress.put(plugin, ready);
+	}
+	
+	public void reset(){
+		p.setFoodLevel(20);
+		p.setHealth(p.getMaxHealth());
+		p.getInventory().clear();
+		
+		for(PotionEffect potion : p.getActivePotionEffects()){
+			p.removePotionEffect(potion.getType());
+		}
+		
+		for(int position : HangoutPlayerManager.getStandardLoadout().keySet()){
+			p.getInventory().setItem(position, HangoutPlayerManager.getStandardLoadout().get(position));
+		}
+	}
+	
+	/*
+	 * Friends
+	 */
+	public boolean addFriend(HangoutPlayer p, boolean executeDatabaseCommand){
+		if(p == this){
+			return false;
+		}
+		
+		if(!friends.contains(p)){
+			friends.add(p);
+			HangoutAPI.sendDebugMessage(this.getName() + " has added " + p.getName() + " as friend");
+			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), true);
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean removeFriend(HangoutPlayer p, boolean executeDatabaseCommand){
+		if(friends.contains(p)){
+			friends.remove(p);
+			HangoutAPI.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend");
+			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), false);
+			p.attemptRemove();
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public void setFriends(List<HangoutPlayer> list){
+		friends = list;
+	}
+	
+	public boolean isFriend(UUID id){
+		if(friends.contains(id)){
+			return true;
+		}
+		return false;
+	}
+	
+	public List<HangoutPlayer> getFriends(){
+		return friends;
+	}
+	
+	public List<HangoutPlayer> getOnlineFriends(){
+		List<HangoutPlayer> onlineFriends = new ArrayList<HangoutPlayer>();
+		for(HangoutPlayer p : friends){
+			if(p.isOnline()){
+				onlineFriends.add(p);
+			}
+		}
+		return onlineFriends;
+	}
+	
+	public boolean isMuted(){
+		return violations.isMuted();
+	}
+	
+	public void setMutedUntil(String reason, int time, HangoutPlayer adminP, boolean commitToDatabase){
+		violations.setMutedUntil(DateTime.now().plusMinutes(time));
+		
+		if(commitToDatabase){
+			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "MUTE");
+		}
+		
+		HangoutAPI.sendDebugMessage(adminP.getName() + " has muted " + this.getName() + " for " + time + " because: " + reason);
+	}
+	
+	public boolean isBanned(){
+		return violations.isBanned();
+	}
+	
+	public void setBannedUntil(String reason, int time, HangoutPlayer adminP, boolean commitToDatabase){
+		violations.setBannedUntil(DateTime.now().plusMinutes(time), reason);
+		
+		if(commitToDatabase){
+			String fullMessage = "You have been banned: " + reason;
+			if(fullMessage.length() > 256){
+				fullMessage = fullMessage.substring(0, 255);
+			}
+			
+			p.kickPlayer(fullMessage);
+			
+			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "BAN");
+		}
+		
+		HangoutAPI.sendDebugMessage(adminP.getName() + " has banned " + this.getName() + " for " + time + " because: " + reason);
+	}
+	
+	public void kick(String reason, HangoutPlayer adminP, boolean commitToDatabase){
+		String fullMessage = "You have been kicked: " + reason;
+		if(fullMessage.length() > 256){
+			fullMessage = fullMessage.substring(0, 255);
+		}
+		
+		p.kickPlayer(fullMessage);
+		
+		if(commitToDatabase){
+			HangoutAPI.sendDebugMessage(adminP.getName() + " has kicked " + this.getName() + " because: " + reason);
+			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), 0, reason, "KICK");
+		}
+	}
+	
+	public ViolationReport getViolationReport(){
+		return violations;
+	}
+	
+	public List<PlayerRank> getRanks(){
+		return ranks;
+	}
+	
+	public void addRank(PlayerRank rank, boolean commitToDatabase){
+		if(!getRanks().contains(rank)){
+			getRanks().add(rank);
+		}
+		
+		if(commitToDatabase){
+			Database.executeRankAction(getUUID(), rank, "GRANT");
+		}
+	}
+	
+	public void removeRank(PlayerRank rank, boolean commitToDatabase){
+		if(getRanks().contains(rank)){
+			getRanks().remove(rank);
+		}
+		
+		if(commitToDatabase){
+			Database.executeRankAction(getUUID(), rank, "REMOVE");
+		}
+	}
+	
+	public PlayerRank getHighestRank(){
+		PlayerRank highestRank = getRanks().get(0);
+		for(PlayerRank r : getRanks()){
+			if(r.isRankOrHigher(highestRank)){
+				highestRank = r;
+			}
+		}
+		return highestRank;
+	}
+	
+	public boolean hasRank(PlayerRank r){
+		if(getRanks().contains(r)) return true;
+		return false;
+	}
+	
+	public ChatChannel getChatChannel(){
+		return channel;
+	}
+	
+	public void setChatChannel(ChatChannel c){
+		channel = c;
+	}
+	
+	public List<UUID> getMutedPlayers(){
+		return mutedPlayers;
+	}
+	
+	public void removeMutedPlayer(UUID id, boolean commitToDatabase){
+		if(mutedPlayers.contains(id)){
+			mutedPlayers.remove(id);
+			
+			if(commitToDatabase){
+				Database.executeMuteAction(getUUID(), id, "UNMUTE");
+			}
+		}
+	}
+	
+	public void addMutedPlayer(UUID id, boolean commitToDatabase){
+		if(!mutedPlayers.contains(id)){
+			mutedPlayers.add(id);
+			
+			if(commitToDatabase){
+				Database.executeMuteAction(getUUID(), id, "MUTE");
+			}
+		}
+	}
+	
+	public boolean hasMutedPlayer(UUID id){
+		if(mutedPlayers.contains(id)) return true;
+		return false;
+	}
+	
+	public void setPvpEnabled(boolean b){
+		pvpEnabled = b;
+	}
+	
+	public boolean isPvpEnabled(){
+		return pvpEnabled;
+	}
+	
+	public void modifyGold(int gold, String source, boolean commitToDatabase){
+		this.gold += gold;
+		
+		HangoutAPI.sendDebugMessage(getName() + " got " + gold + " from " + source);
+		if(commitToDatabase){
+			Database.executeGoldAction(getUUID(), gold, source);
+		}
+	}
+	
+	public int getCurrency(){
+		return gold;
+	}
+	
+	public void attemptRemove(){
+		boolean clearToRemove = true;
+		for(HangoutPlayer otherP : HangoutPlayerManager.getPlayers()){
+			if(otherP.getFriends().contains(otherP)){
+				clearToRemove = false;
+				break;
+			}
+		}
+		
+		if(clearToRemove){
+			
+			//Clear player
+			CommonPlayerManager.removePlayer(getUUID());			
+			HangoutPlayerManager.removePlayer(this);
+		}
+	}
+}

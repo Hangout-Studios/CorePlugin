@@ -1,0 +1,12 @@
+locale: en
+RealServer: false
+SQL:
+  Database: server_hangout
+  Hangout:
+    IP: localhost
+    Username: admin
+    Password: password
+  Local:
+    IP: localhost
+    Username: root
+    Password: ''
