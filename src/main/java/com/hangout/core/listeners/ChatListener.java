@@ -14,7 +14,7 @@ public class ChatListener implements Listener {
 	public void onChat(AsyncPlayerChatEvent e){
 		HangoutPlayer p = HangoutPlayerManager.getPlayer(e.getPlayer());
 		String message = e.getMessage();
-		ChatManager.sendMessage(p, message, p.getChatChannel());
+		ChatManager.sendMessage(p, message, p.getChatChannel(), null);
 		e.setCancelled(true);
 	}
 }

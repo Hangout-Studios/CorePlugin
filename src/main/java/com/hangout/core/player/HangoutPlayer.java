@@ -15,6 +15,7 @@ import org.joda.time.DateTime;
 
 import com.hangout.core.HangoutAPI;
 import com.hangout.core.chat.ChatChannel;
+import com.hangout.core.chat.ChatManager;
 import com.hangout.core.menu.MenuInventory;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.CommandPreparer;
@@ -37,7 +38,8 @@ public class HangoutPlayer {
 	private PlayerState playerState = PlayerState.LOADING;
 	private ViolationReport violations = new ViolationReport();
 	private List<PlayerRank> ranks = new ArrayList<PlayerRank>();
-	private ChatChannel channel = ChatChannel.SAY;
+	private ChatChannel channel;
+	private List<ChatChannel> subscribedChannels;
 	private List<UUID> mutedPlayers = new ArrayList<UUID>();
 	private boolean pvpEnabled = false;
 	private int gold = 0;
@@ -52,6 +54,8 @@ public class HangoutPlayer {
 		this.p = p;
 		id = p.getUniqueId();
 		name = p.getName();
+		subscribedChannels = ChatManager.getChannels();
+		channel = subscribedChannels.get(0);
 	}
 	
 	public HangoutPlayer(UUID id, String name){
@@ -339,6 +343,29 @@ public class HangoutPlayer {
 	
 	public void setChatChannel(ChatChannel c){
 		channel = c;
+	}
+	
+	public List<ChatChannel> getSubscribedChannels(){
+		return subscribedChannels;
+	}
+	
+	public void removeSubscribedChannel(ChatChannel c){
+		if(subscribedChannels.contains(c)){
+			subscribedChannels.remove(c);
+		}
+	}
+	
+	public void addSubscribedChannel(ChatChannel c){
+		if(!subscribedChannels.contains(c)){
+			subscribedChannels.add(c);
+		}
+	}
+	
+	public boolean isSubscribedToChannel(ChatChannel c){
+		if(subscribedChannels.contains(c)){
+			return true;
+		}
+		return false;
 	}
 	
 	public List<UUID> getMutedPlayers(){

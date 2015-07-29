@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.hangout.core.chat.ChatManager;
+import com.hangout.core.chat.ChatChannel.ChatChannelType;
 import com.hangout.core.commands.AdminCommand;
 import com.hangout.core.commands.MuteCommand;
 import com.hangout.core.commands.ReportCommand;
@@ -57,6 +59,12 @@ public class Plugin extends JavaPlugin {
 		MenuInventory mainMenu = HangoutAPI.createMenu(menuItem, "Main menu", 3, "mainmenu");
 		
 		HangoutAPI.createMenuItem(mainMenu, Material.SKULL, "Friend list", Arrays.asList("Check out your friends!"), 2 + 9, "friendlist");
+		
+		//Add chat channels
+		ChatManager.createChannel("local", "(L)", "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL);
+		ChatManager.createChannel("area", "(A)", "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION);
+		ChatManager.createChannel("global", "(W)", "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL);
+		ChatManager.createChannel("whisper", "(w)", "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.LOCAL);
 	}
 	
 	public void onDisable(){
