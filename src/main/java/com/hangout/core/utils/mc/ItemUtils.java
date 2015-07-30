@@ -3,6 +3,7 @@ package com.hangout.core.utils.mc;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,7 +21,7 @@ public class ItemUtils {
 	}
 	
 	public static ItemStack getPlayerHead(Player p, String name, List<String> description){
-		ItemStack head = new ItemStack(Material.SKULL_ITEM);
+		ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
 		SkullMeta im = (SkullMeta) head.getItemMeta();
         im.setOwner(p.getName());
         im.setDisplayName(name);
