@@ -12,8 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.hangout.core.Config;
-import com.hangout.core.HangoutAPI;
 import com.hangout.core.Plugin;
+import com.hangout.core.utils.database.Database;
 
 public class HangoutPlayerManager {
 	
@@ -63,7 +63,7 @@ public class HangoutPlayerManager {
 	}
 	
 	public static UUID getUUID(String playername){
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
                 "SELECT player_id FROM " + Config.databaseName + ".players WHERE name = ?;")) {
             pst.setString(1, playername);
             

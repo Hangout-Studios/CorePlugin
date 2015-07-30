@@ -3,6 +3,8 @@ package com.hangout.core.utils.mc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import com.hangout.core.player.HangoutPlayer;
 
 public class CommandPreparer {
@@ -27,11 +29,11 @@ public class CommandPreparer {
 			p.getPlayer().sendMessage("This is no longer valid.");
 		}
 		
-		String command = "/";
+		String command = "";
 		for(String s : parts){
 			command += s + " ";
 		}
 		command = command.substring(0,command.length() - 1);
-		p.getPlayer().chat(command);
+		Bukkit.dispatchCommand(p.getPlayer(), command);
 	}
 }

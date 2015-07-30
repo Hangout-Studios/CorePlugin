@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.joda.time.DateTime;
 
-import com.hangout.core.HangoutAPI;
+import com.hangout.core.Plugin;
 import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.chat.ChatManager;
 import com.hangout.core.menu.MenuInventory;
@@ -54,8 +54,6 @@ public class HangoutPlayer {
 		this.p = p;
 		id = p.getUniqueId();
 		name = p.getName();
-		subscribedChannels = ChatManager.getChannels();
-		channel = subscribedChannels.get(0);
 	}
 	
 	public HangoutPlayer(UUID id, String name){
@@ -124,7 +122,7 @@ public class HangoutPlayer {
 		FancyMessage message = new FancyMessage("");
 		
 		if(addChatTag){
-			message.then(getChatChannel().getTag() + " ");
+			message.then(getChatChannel().getDisplayName() + ChatColor.WHITE + " ");
 		}
 		
 		HashMap<String, Object> nameConfig =  getClickableNameConfig(toPlayer);
@@ -200,7 +198,7 @@ public class HangoutPlayer {
 		
 		if(!friends.contains(p)){
 			friends.add(p);
-			HangoutAPI.sendDebugMessage(this.getName() + " has added " + p.getName() + " as friend");
+			Plugin.sendDebugMessage(this.getName() + " has added " + p.getName() + " as friend");
 			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), true);
 			return true;
 		}else{
@@ -211,7 +209,7 @@ public class HangoutPlayer {
 	public boolean removeFriend(HangoutPlayer p, boolean executeDatabaseCommand){
 		if(friends.contains(p)){
 			friends.remove(p);
-			HangoutAPI.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend");
+			Plugin.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend");
 			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), false);
 			p.attemptRemove();
 			return true;
@@ -256,7 +254,7 @@ public class HangoutPlayer {
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "MUTE");
 		}
 		
-		HangoutAPI.sendDebugMessage(adminP.getName() + " has muted " + this.getName() + " for " + time + " because: " + reason);
+		Plugin.sendDebugMessage(adminP.getName() + " has muted " + this.getName() + " for " + time + " because: " + reason);
 	}
 	
 	public boolean isBanned(){
@@ -277,7 +275,7 @@ public class HangoutPlayer {
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "BAN");
 		}
 		
-		HangoutAPI.sendDebugMessage(adminP.getName() + " has banned " + this.getName() + " for " + time + " because: " + reason);
+		Plugin.sendDebugMessage(adminP.getName() + " has banned " + this.getName() + " for " + time + " because: " + reason);
 	}
 	
 	public void kick(String reason, HangoutPlayer adminP, boolean commitToDatabase){
@@ -289,7 +287,7 @@ public class HangoutPlayer {
 		p.kickPlayer(fullMessage);
 		
 		if(commitToDatabase){
-			HangoutAPI.sendDebugMessage(adminP.getName() + " has kicked " + this.getName() + " because: " + reason);
+			Plugin.sendDebugMessage(adminP.getName() + " has kicked " + this.getName() + " because: " + reason);
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), 0, reason, "KICK");
 		}
 	}
@@ -335,6 +333,11 @@ public class HangoutPlayer {
 	public boolean hasRank(PlayerRank r){
 		if(getRanks().contains(r)) return true;
 		return false;
+	}
+	
+	public void resetChatChannels(){
+		subscribedChannels = ChatManager.getChannels();
+		channel = subscribedChannels.get(0);
 	}
 	
 	public ChatChannel getChatChannel(){
@@ -408,7 +411,7 @@ public class HangoutPlayer {
 	public void modifyGold(int gold, String source, boolean commitToDatabase){
 		this.gold += gold;
 		
-		HangoutAPI.sendDebugMessage(getName() + " got " + gold + " from " + source);
+		Plugin.sendDebugMessage(getName() + " got " + gold + " from " + source);
 		if(commitToDatabase){
 			Database.executeGoldAction(getUUID(), gold, source);
 		}

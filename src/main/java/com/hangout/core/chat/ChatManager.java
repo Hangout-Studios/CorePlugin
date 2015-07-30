@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -24,8 +25,8 @@ public class ChatManager {
 		return null;
 	}
 	
-	public static ChatChannel createChannel(String tag, String displayTag, String displayName, List<String> description, ChatChannelType type){
-		ChatChannel c = new ChatChannel(tag, displayTag, displayName, description, type);
+	public static ChatChannel createChannel(String tag, String displayTag, String displayName, List<String> description, ChatChannelType type, Material mat){
+		ChatChannel c = new ChatChannel(tag, displayTag, displayName, description, type, mat);
 		channels.put(tag, c);
 		return c;
 	}
@@ -53,6 +54,7 @@ public class ChatManager {
 					players.add(onlineHP);
 				}
 				break;
+				
 			case LOCAL:
 				Vector pV = p.getPlayer().getLocation().toVector();
 				for(Player online : Bukkit.getOnlinePlayers()){

@@ -17,6 +17,11 @@ public class MenuItem {
 		this.tag = itemTag;
 	}
 	
+	public MenuItem(ItemStack item, String itemTag){
+		this.item = item;
+		this.tag = itemTag;
+	}
+	
 	public ItemStack getItemStack(){
 		return item;
 	}

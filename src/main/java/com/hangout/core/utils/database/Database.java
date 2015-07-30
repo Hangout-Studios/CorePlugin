@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.joda.time.DateTime;
 
 import com.hangout.core.Config;
-import com.hangout.core.HangoutAPI;
 import com.hangout.core.Plugin;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
@@ -178,7 +177,7 @@ public class Database {
     	
     	//Load violations
     	ViolationReport report = hp.getViolationReport();
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
                 "SELECT action, duration, timestamp, reason FROM " + Config.databaseName + ".admin_action WHERE player_id = ? ORDER BY action_id ASC;")) {
             pst.setString(1, id.toString());
             ResultSet rs = pst.executeQuery();
@@ -203,7 +202,7 @@ public class Database {
 		}
 		
 		//Load ranks
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
                 "SELECT action, rank FROM " + Config.databaseName + ".rank_action WHERE player_id = ? ORDER BY action_id ASC;")) {
             pst.setString(1, id.toString());
             ResultSet rs = pst.executeQuery();
@@ -237,7 +236,7 @@ public class Database {
 		}
 		
 		//Load mute actions
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
 				"SELECT action, muted_id FROM " + Config.databaseName + ".mute_action WHERE player_id = ? ORDER BY action_id ASC;")) {
 			pst.setString(1, id.toString());
 			ResultSet rs = pst.executeQuery();
@@ -259,7 +258,7 @@ public class Database {
 		}
 		
 		//Load mute actions
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
 				"SELECT pvp_on FROM " + Config.databaseName + ".pvpflag_action WHERE player_id = ? ORDER BY action_id DESC LIMIT 1;")) {
 			pst.setString(1, id.toString());
 			ResultSet rs = pst.executeQuery();
@@ -275,7 +274,7 @@ public class Database {
 		}
 		
 		//Load gold
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
 				"SELECT sum(gold) as 'goldsum' FROM " + Config.databaseName + ".gold_action WHERE player_id = ?;")) {
 			pst.setString(1, id.toString());
 			ResultSet rs = pst.executeQuery();

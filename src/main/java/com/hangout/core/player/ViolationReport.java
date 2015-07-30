@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.joda.time.DateTime;
 
 import com.hangout.core.Config;
-import com.hangout.core.HangoutAPI;
+import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.time.TimeUtils;
 
 public class ViolationReport {
@@ -73,7 +73,7 @@ public class ViolationReport {
 	
 	public static List<String> getReport(UUID id){
 		
-		try (PreparedStatement pst = HangoutAPI.getDatabase().prepareStatement(
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
                 "SELECT action, COUNT(*) as 'count' FROM " + Config.databaseName + ".admin_action WHERE player_id = ? GROUP BY action;")) {
             pst.setString(1, id.toString());
             ResultSet rs = pst.executeQuery();

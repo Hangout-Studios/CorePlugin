@@ -14,12 +14,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.joda.time.DateTime;
 
-import com.hangout.core.HangoutAPI;
 import com.hangout.core.Plugin;
 import com.hangout.core.events.PlayerJoinCompleteEvent;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
 import com.hangout.core.events.PlayerQuitCompleteEvent;
+import com.hangout.core.player.CommonPlayerManager;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayer.PlayerState;
 import com.hangout.core.player.HangoutPlayerManager;
@@ -41,7 +41,7 @@ public class PlayerListener implements Listener {
 		//We don't have to wait for this, since it's loaded when the player is created
 		if(hp.isBanned()){
 			e.disallow(Result.KICK_BANNED, "You are banned. Time left: " + hp.getViolationReport().getTimeLeftBanned());
-			HangoutAPI.sendDebugMessage("Player " + playerName + " tried logging on, but is banned");
+			Plugin.sendDebugMessage("Player " + playerName + " tried logging on, but is banned");
 			HangoutPlayerManager.removePlayer(hp);
 			return;
 		}
@@ -55,6 +55,7 @@ public class PlayerListener implements Listener {
 		
 		hp.setPlayer(e.getPlayer());
 		hp.setPlayerState(PlayerState.COMPLETED);
+		hp.resetChatChannels();
 		Plugin.sendDebugMessage("Player logged in and linked: " + hp.getName());						
 		Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinCompleteEvent(hp));
 	}
@@ -75,7 +76,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerPostLoad(PlayerPostLoadEvent e){
 		e.getPlayer().setLastOnline(new DateTime((Timestamp)e.getProperty("last_online")));
-		HangoutAPI.addCommonPlayer(e.getPlayer().getUUID(), "Hangout", e.getPlayer());
+		CommonPlayerManager.addPlayer(e.getPlayer().getUUID(), "Hangout", e.getPlayer());
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)

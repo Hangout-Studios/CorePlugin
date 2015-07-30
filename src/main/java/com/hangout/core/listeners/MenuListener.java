@@ -1,94 +1,79 @@
 package com.hangout.core.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
-import com.hangout.core.Plugin;
-import com.hangout.core.events.MenuClickEvent;
-import com.hangout.core.events.MenuCloseEvent;
-import com.hangout.core.menu.MenuInventory;
-import com.hangout.core.menu.MenuItem;
-import com.hangout.core.menu.MenuManager;
+import com.hangout.core.chat.ChatChannel;
+import com.hangout.core.chat.ChatManager;
+import com.hangout.core.events.CustomItemClickEvent;
+import com.hangout.core.events.CustomItemUseEvent;
+import com.hangout.core.events.MenuItemClickEvent;
+import com.hangout.core.menu.MenuUtils;
 import com.hangout.core.player.HangoutPlayer;
-import com.hangout.core.player.HangoutPlayerManager;
 
 public class MenuListener implements Listener {
 	
 	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent e){
-		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getPlayer());
-		MenuInventory menu = p.getOpenMenu();
-		
-		if(menu != null){
-			p.setOpenMenu(null);
-			
-			if(menu.isTemporary()){
-				MenuManager.removeMenu(menu.getTag());
-			}
-			
-			Plugin.sendDebugMessage(p.getName() + " closed menu " + menu.getTitle());
-			
-			Bukkit.getPluginManager().callEvent(new MenuCloseEvent(p, menu));
+	public void onCustomItemClick(CustomItemClickEvent e){
+		if(e.getCustomItem().getTag().equals("main_menu")){
+			MenuUtils.createMainMenu(e.getHangoutPlayer()).openMenu(e.getHangoutPlayer());
+			return;
 		}
 	}
 	
 	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e){
-		if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
-            return;
-		
-		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getWhoClicked());
-		
-		ItemStack item = e.getCurrentItem();
-		
-		for(MenuInventory menu : MenuManager.getMenus()){
-			if(menu.getItemStack().equals(item)){
-				menu.openMenu(p);
-				e.setCancelled(true);
-				return;
-			}
-		}
-		
-		if(p.isInMenu()){
-			for(MenuItem menuItem : p.getOpenMenu().getMenuItems()){
-				if(menuItem.getItemStack().equals(item)){
-					Bukkit.getPluginManager().callEvent(new MenuClickEvent(p, menuItem));
-					Plugin.sendDebugMessage(p.getName() + " has clicked item in menu " + menuItem.getName());
-					e.setCancelled(true);
-					return;
-				}
-			}
+	public void onCustomItemUse(CustomItemUseEvent e){
+		if(e.getCustomItem().getTag().equals("main_menu")){
+			MenuUtils.createMainMenu(e.getHangoutPlayer()).openMenu(e.getHangoutPlayer());
+			return;
 		}
 	}
 	
 	@EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e) {
-		Player p = e.getPlayer();
-        HangoutPlayer hp = HangoutPlayerManager.getPlayer(p.getUniqueId());
-        
-        //Only work with right clicks
-        if(e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        
-      //Check if the player has an item in his hand
-        if (!e.hasItem())
-            return;
-        if (e.getItem().getType() == Material.AIR)
-            return;
-        
-        for(MenuInventory menu : MenuManager.getMenus()){
-			if(menu.getItemStack().equals(e.getItem())){
-				menu.openMenu(hp);
-				e.setCancelled(true);
-				return;
+	public void onMenuClick(MenuItemClickEvent e){
+		
+		//Settings button
+		HangoutPlayer p = e.getPlayer();
+		if(e.getItem().getTag().equals("settings")){
+			MenuUtils.createSettingsMenu(p).openMenu(p);
+		}
+		
+		//Channel stuff
+		if(e.getItem().getTag().startsWith("channel_")){
+			String[] split = e.getItem().getTag().split("_");
+			
+			String command = split[1];
+			ChatChannel channel = ChatManager.getChannel(split[2]);
+			
+			if(channel == null) return;
+			
+			if(command.equals("subscribe")){
+				p.addSubscribedChannel(channel);
+				p.getPlayer().sendMessage("You started listening to channel: " + channel.getDisplayName());
+			}else if(command.equals("unsubscribe")){
+				p.removeSubscribedChannel(channel);
+				p.getPlayer().sendMessage("You stopped listening to channel: " + channel.getDisplayName());
+			}else if(command.equals("setactive")){
+				p.setChatChannel(channel);
+				p.getPlayer().sendMessage("You are now chatting in channel: " + channel.getDisplayName());
 			}
+			
+			if(command != "description"){
+				MenuUtils.createSettingsMenu(p).openMenu(p);
+			}
+			return;
+		}
+		
+		if(e.getItem().getTag().startsWith("pvp_enable")){
+			p.setPvpEnabled(true);
+			p.getPlayer().sendMessage("You have enabled PvP!");
+			MenuUtils.createSettingsMenu(p).openMenu(p);
+		}
+		
+		if(e.getItem().getTag().startsWith("pvp_disable")){
+			p.setPvpEnabled(false);
+			p.getPlayer().sendMessage("You have disabled PvP!");
+			MenuUtils.createSettingsMenu(p).openMenu(p);
 		}
 	}
 }

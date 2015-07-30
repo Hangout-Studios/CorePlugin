@@ -13,12 +13,16 @@ import com.hangout.core.commands.AdminCommand;
 import com.hangout.core.commands.MuteCommand;
 import com.hangout.core.commands.ReportCommand;
 import com.hangout.core.commands.TextCommand;
+import com.hangout.core.item.CustomItem;
+import com.hangout.core.item.CustomItemManager;
 import com.hangout.core.listeners.BattleListener;
 import com.hangout.core.listeners.ChatListener;
+import com.hangout.core.listeners.InventoryListener;
 import com.hangout.core.listeners.ItemListener;
 import com.hangout.core.listeners.MenuListener;
 import com.hangout.core.listeners.PlayerListener;
-import com.hangout.core.menu.MenuInventory;
+import com.hangout.core.player.HangoutPlayerManager;
+import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.database.Database.PropertyTypes;
 import com.hangout.core.utils.lang.MessageManager;
 import com.hangout.core.utils.mc.ItemUtils;
@@ -42,6 +46,7 @@ public class Plugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		this.getServer().getPluginManager().registerEvents(new ItemListener(), this);
 		this.getServer().getPluginManager().registerEvents(new BattleListener(), this);
+		this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
 		
 		this.getCommand("text").setExecutor(new TextCommand());
 		this.getCommand("admin").setExecutor(new AdminCommand());
@@ -50,21 +55,19 @@ public class Plugin extends JavaPlugin {
 		this.getCommand("unmute").setExecutor(new MuteCommand());
 		
 		//Add custom loading properties
-		HangoutAPI.addCustomPlayerProperty("name", PropertyTypes.STRING);
-		HangoutAPI.addCustomPlayerProperty("last_online", PropertyTypes.TIMESTAMP);
+		Database.addCustomPlayerProperty("name", PropertyTypes.STRING);
+		Database.addCustomPlayerProperty("last_online", PropertyTypes.TIMESTAMP);
 		
 		//Create some custom items
 		ItemStack menuItem = ItemUtils.createItem(Material.PAPER, "Open interface", Arrays.asList("Right click to use"));
-		HangoutAPI.addStandardLoadoutItem(menuItem, 8);
-		MenuInventory mainMenu = HangoutAPI.createMenu(menuItem, "Main menu", 3, "mainmenu");
-		
-		HangoutAPI.createMenuItem(mainMenu, Material.SKULL, "Friend list", Arrays.asList("Check out your friends!"), 2 + 9, "friendlist");
+		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false));
+		HangoutPlayerManager.addStandardLoadoutItem(menuItem, 8);
 		
 		//Add chat channels
-		ChatManager.createChannel("local", "(L)", "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL);
-		ChatManager.createChannel("area", "(A)", "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION);
-		ChatManager.createChannel("global", "(W)", "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL);
-		ChatManager.createChannel("whisper", "(w)", "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.LOCAL);
+		ChatManager.createChannel("local", "(L)", ChatColor.GRAY + "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL, Material.DIRT);
+		ChatManager.createChannel("area", "(A)", ChatColor.RED + "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION, Material.GRASS);
+		ChatManager.createChannel("global", "(W)", ChatColor.GOLD + "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL, Material.NETHER_STAR);
+		ChatManager.createChannel("whisper", "(w)", ChatColor.LIGHT_PURPLE + "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM);
 	}
 	
 	public void onDisable(){

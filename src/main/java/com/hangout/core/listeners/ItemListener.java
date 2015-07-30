@@ -6,12 +6,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.hangout.core.Plugin;
+import com.hangout.core.events.CustomItemClickEvent;
 import com.hangout.core.events.CustomItemUseEvent;
+import com.hangout.core.events.MenuItemClickEvent;
 import com.hangout.core.item.CustomItem;
 import com.hangout.core.item.CustomItemManager;
+import com.hangout.core.menu.MenuItem;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 
@@ -33,9 +39,45 @@ public class ItemListener implements Listener {
         if(!e.getItem().hasItemMeta()) return;
         
         CustomItem cm = CustomItemManager.getItem(e.getItem().getItemMeta().getDisplayName());
-        if(cm != null){
+        if(cm != null && cm.allowRightClick()){
         	Bukkit.getPluginManager().callEvent(new CustomItemUseEvent(cm, hp));
         	Plugin.sendDebugMessage(hp.getDisplayName() + " used custom item " + cm.getName());
         }
+	}
+	
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent e){
+		if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+            return;
+		
+		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getWhoClicked());
+		ItemStack item = e.getCurrentItem();
+		
+		CustomItem ci = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
+		if(ci != null){
+			Bukkit.getPluginManager().callEvent(new CustomItemClickEvent(ci, p));
+			Plugin.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + ci.getName());
+		}
+		
+		if(p.isInMenu()){
+			for(MenuItem menuItem : p.getOpenMenu().getMenuItems()){
+				if(menuItem.getItemStack().equals(item)){
+					Bukkit.getPluginManager().callEvent(new MenuItemClickEvent(p, menuItem));
+					Plugin.sendDebugMessage(p.getName() + " has clicked item in menu " + menuItem.getName());
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent e){
+		ItemStack item = e.getItemDrop().getItemStack();
+		
+		CustomItem ci = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
+		if(ci != null && !ci.allowDrop()){
+			e.setCancelled(true);
+		}
 	}
 }
