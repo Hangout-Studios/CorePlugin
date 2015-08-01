@@ -12,8 +12,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.hangout.core.Config;
-import com.hangout.core.Plugin;
 import com.hangout.core.utils.database.Database;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class HangoutPlayerManager {
 	
@@ -36,18 +37,18 @@ public class HangoutPlayerManager {
 	
 	public static void addPlayer(HangoutPlayer p){
 		players.put(p.getUUID(), p);
-		Plugin.sendDebugMessage("Player added: " + p.getName());
+		DebugUtils.sendDebugMessage("Player added: " + p.getName(), DebugMode.DEBUG);
 	}
 	
 	public static void setPlayer(HangoutPlayer p){
 		players.put(p.getUUID(), p);
-		Plugin.sendDebugMessage("Player set with class " + p.getClass().toGenericString());
+		DebugUtils.sendDebugMessage("Player set with class " + p.getClass().toGenericString(), DebugMode.DEBUG);
 	}
 	
 	public static void removePlayer(HangoutPlayer p){
 		if(!players.containsKey(p.getUUID())) return;
 		players.remove(p.getUUID());
-		Plugin.sendDebugMessage("Player removed: " + p.getName());
+		DebugUtils.sendDebugMessage("Player removed: " + p.getName(), DebugMode.DEBUG);
 	}
 	
 	public static List<HangoutPlayer> getPlayers(){

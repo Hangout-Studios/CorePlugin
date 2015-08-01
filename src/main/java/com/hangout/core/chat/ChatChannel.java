@@ -2,7 +2,6 @@ package com.hangout.core.chat;
 
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 public class ChatChannel {
@@ -15,27 +14,23 @@ public class ChatChannel {
 	}
 	
 	private String tag;
-	private String displayTag;
 	private String displayName;
 	List<String> description;
 	private ChatChannelType type;
 	private Material mat;
+	private boolean isSelectable = true;
 	
-	ChatChannel(String tag, String displayTag, String displayName, List<String> description, ChatChannelType type, Material mat){
+	ChatChannel(String tag, String displayName, List<String> description, ChatChannelType type, Material mat, boolean isSelectable){
 		this.tag = tag;
-		this.displayTag = displayTag;
 		this.displayName = displayName;
 		this.description = description;
 		this.type = type;
 		this.mat = mat;
+		this.isSelectable = isSelectable;
 	}
 	
 	public String getTag(){
 		return tag;
-	}
-	
-	public String getDisplayTag(){
-		return ChatColor.ITALIC + displayTag;
 	}
 	
 	public String getDisplayName(){
@@ -52,5 +47,9 @@ public class ChatChannel {
 	
 	public Material getMaterial(){
 		return mat;
+	}
+	
+	public boolean isSelectable(){
+		return isSelectable;
 	}
 }

@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.events.CustomItemClickEvent;
 import com.hangout.core.events.CustomItemUseEvent;
 import com.hangout.core.events.MenuItemClickEvent;
@@ -20,6 +19,8 @@ import com.hangout.core.item.CustomItemManager;
 import com.hangout.core.menu.MenuItem;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class ItemListener implements Listener {
 	
@@ -41,7 +42,7 @@ public class ItemListener implements Listener {
         CustomItem cm = CustomItemManager.getItem(e.getItem().getItemMeta().getDisplayName());
         if(cm != null && cm.allowRightClick()){
         	Bukkit.getPluginManager().callEvent(new CustomItemUseEvent(cm, hp));
-        	Plugin.sendDebugMessage(hp.getDisplayName() + " used custom item " + cm.getName());
+        	DebugUtils.sendDebugMessage(hp.getDisplayName() + " used custom item " + cm.getName(), DebugMode.DEBUG);
         }
 	}
 	
@@ -56,14 +57,14 @@ public class ItemListener implements Listener {
 		CustomItem ci = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
 		if(ci != null){
 			Bukkit.getPluginManager().callEvent(new CustomItemClickEvent(ci, p));
-			Plugin.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + ci.getName());
+			DebugUtils.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + ci.getName(), DebugMode.EXTENSIVE);
 		}
 		
 		if(p.isInMenu()){
 			for(MenuItem menuItem : p.getOpenMenu().getMenuItems()){
 				if(menuItem.getItemStack().equals(item)){
 					Bukkit.getPluginManager().callEvent(new MenuItemClickEvent(p, menuItem));
-					Plugin.sendDebugMessage(p.getName() + " has clicked item in menu " + menuItem.getName());
+					DebugUtils.sendDebugMessage(p.getName() + " has clicked item in menu " + menuItem.getName(), DebugMode.EXTENSIVE);
 					e.setCancelled(true);
 					return;
 				}

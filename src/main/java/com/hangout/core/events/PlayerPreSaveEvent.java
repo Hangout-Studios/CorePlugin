@@ -5,8 +5,9 @@ import java.util.HashMap;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class PlayerPreSaveEvent extends Event {
 	
@@ -24,12 +25,12 @@ public class PlayerPreSaveEvent extends Event {
 	
 	public void savePrimaryProperty(String key, Object value){
 		primary.put(key, value);
-		Plugin.sendDebugMessage("Set primary key " + key + " to " + value);
+		DebugUtils.sendDebugMessage("Set primary key " + key + " to " + value, DebugMode.COMPLETE);
 	}
 	
 	public void saveSecondaryProperty(String key, Object value){
 		secondary.put(key, value);
-		Plugin.sendDebugMessage("Set secondary key " + key + " to " + value);
+		DebugUtils.sendDebugMessage("Set secondary key " + key + " to " + value, DebugMode.COMPLETE);
 	}
 	
 	public HashMap<String, Object> getPrimaryMap(){

@@ -6,11 +6,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.events.ChatPlayerClickEvent;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.utils.mc.CommandPreparer;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class TextCommand implements CommandExecutor {
 
@@ -25,7 +26,7 @@ public class TextCommand implements CommandExecutor {
 			
 			Bukkit.getPluginManager().callEvent(
 					new ChatPlayerClickEvent(HangoutPlayerManager.getPlayer(clicked), HangoutPlayerManager.getPlayer(interact)));
-			Plugin.sendDebugMessage(interact.getName() + " clicked " + clicked.getName() + " in chat");
+			DebugUtils.sendDebugMessage(interact.getName() + " clicked " + clicked.getName() + " in chat", DebugMode.COMPLETE);
 			return true;
 		}
 		

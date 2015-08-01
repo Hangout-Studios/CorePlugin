@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.joda.time.DateTime;
 
 import com.hangout.core.Config;
-import com.hangout.core.Plugin;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
 import com.hangout.core.player.HangoutPlayer;
@@ -23,6 +22,8 @@ import com.hangout.core.player.HangoutPlayer.PlayerState;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.player.PlayerRank;
 import com.hangout.core.player.ViolationReport;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 import com.mysql.jdbc.StringUtils;
 
 public class Database {
@@ -51,7 +52,7 @@ public class Database {
                     connection.close();
                 }
             }
-            System.out.print("Connecting to SQL: " + Config.host + ", " + Config.username + ", " + Config.password);
+            DebugUtils.sendDebugMessage("Connecting to SQL: " + Config.host + ", " + Config.username + ", " + Config.password, DebugMode.INFO);
             connection = DriverManager.getConnection("jdbc:mysql://" + Config.host, Config.username, Config.password);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,7 +71,7 @@ public class Database {
     		
     		//Create from id and name
     		hp = new HangoutPlayer(id, playerName);
-    		Plugin.sendDebugMessage("Created player from ID and name.");
+    		DebugUtils.sendDebugMessage("Created player from ID and name.", DebugMode.EXTENSIVE);
     	}
     	
     	HashMap<String, Object> customPropertiesResult = new HashMap<String, Object>();
@@ -80,7 +81,7 @@ public class Database {
     	}
     	columns = columns.substring(0, columns.length() - 2);
     	
-    	Plugin.sendDebugMessage("Loading these values for " + playerName + ": " + columns);
+    	DebugUtils.sendDebugMessage("Loading these values for " + playerName + ": " + columns, DebugMode.EXTENSIVE);
     	
     	//Load stats
     	try (PreparedStatement pst = getConnection().prepareStatement(
@@ -120,10 +121,10 @@ public class Database {
             //Player was created but offline, so we get the name from the db
             if(hp == null){
             	hp = new HangoutPlayer(id, (String) customPropertiesResult.get("name"));
-            	Plugin.sendDebugMessage("Created player from database.");
+            	DebugUtils.sendDebugMessage("Created player from database.", DebugMode.EXTENSIVE);
             }
     	} catch (SQLException e) {
-    		Plugin.sendDebugMessage("Loading of player failed: " + id.toString());
+    		DebugUtils.sendDebugMessage("Loading of player failed: " + id.toString(), DebugMode.WARNING);
 			e.printStackTrace();
 		}
     	
@@ -169,9 +170,9 @@ public class Database {
             
             pst.close();
             
-            Plugin.sendDebugMessage("Loading " + friends.size() + " friends");
+            DebugUtils.sendDebugMessage("Loading " + friends.size() + " friends", DebugMode.EXTENSIVE);
     	} catch (SQLException e) {
-    		Plugin.sendDebugMessage("Loading of friends failed: " + id.toString());
+    		DebugUtils.sendDebugMessage("Loading of friends failed: " + id.toString(), DebugMode.WARNING);
 			e.printStackTrace();
 		}
     	
@@ -257,7 +258,7 @@ public class Database {
 			e.printStackTrace();
 		}
 		
-		//Load mute actions
+		//Load pvp actions
 		try (PreparedStatement pst = Database.getConnection().prepareStatement(
 				"SELECT pvp_on FROM " + Config.databaseName + ".pvpflag_action WHERE player_id = ? ORDER BY action_id DESC LIMIT 1;")) {
 			pst.setString(1, id.toString());
@@ -293,7 +294,7 @@ public class Database {
     	
     	hp.setLoadingState("core", true);
     	
-    	Plugin.sendDebugMessage("Succesfully loaded core player: " + hp.getName());
+    	DebugUtils.sendDebugMessage("Succesfully loaded core player: " + hp.getName(), DebugMode.INFO);
     	return hp;
     }
     
@@ -411,7 +412,7 @@ public class Database {
     	
     	String completeQuery = "INSERT INTO " + Config.databaseName + "." + table + " " + keyList + " VALUES " + questionMarkList + 
     			" ON DUPLICATE KEY UPDATE " + valueList + ";";
-    	Plugin.sendDebugMessage("Query to execute: " + completeQuery);
+    	DebugUtils.sendDebugMessage("Query to execute: " + completeQuery, DebugMode.COMPLETE);
     	
     	try (PreparedStatement pst = getConnection().prepareStatement(completeQuery)){
     		List<String> keys = new ArrayList<String>(compiled.keySet());
@@ -419,19 +420,19 @@ public class Database {
     			Object o = compiled.get(keys.get(i));
     			if(o instanceof String){
     				pst.setString(i + 1, (String)o);
-    	    		Plugin.sendDebugMessage("Key: " + (i + 1) + ", string: " + o);
+    				DebugUtils.sendDebugMessage("Key: " + (i + 1) + ", string: " + o, DebugMode.COMPLETE);
     			}
     			if(o instanceof Integer){
     				pst.setInt(i + 1, (Integer)o);
-    				Plugin.sendDebugMessage("Key: " + (i + 1) + ", integer: " + o);
+    				DebugUtils.sendDebugMessage("Key: " + (i + 1) + ", integer: " + o, DebugMode.COMPLETE);
     			}
     			if(o instanceof Timestamp){
     				pst.setTimestamp(i + 1, (Timestamp)o);
-    				Plugin.sendDebugMessage("Key: " + (i + 1) + ", timestamp: " + o);
+    				DebugUtils.sendDebugMessage("Key: " + (i + 1) + ", timestamp: " + o, DebugMode.COMPLETE);
     			}
     			if(o instanceof Boolean){
     				pst.setBoolean(i + 1, (Boolean)o);
-    				Plugin.sendDebugMessage("Key: " + (i + 1) + ", boolean: " + o);
+    				DebugUtils.sendDebugMessage("Key: " + (i + 1) + ", boolean: " + o, DebugMode.COMPLETE);
     			}
     		}
     		pst.execute();

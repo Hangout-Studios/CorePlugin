@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class CommandPreparer {
 	
@@ -34,6 +35,8 @@ public class CommandPreparer {
 			command += s + " ";
 		}
 		command = command.substring(0,command.length() - 1);
+		
+		DebugUtils.sendDebugMessage("Command via preparer: /" + command, DebugMode.INFO);
 		Bukkit.dispatchCommand(p.getPlayer(), command);
 	}
 }

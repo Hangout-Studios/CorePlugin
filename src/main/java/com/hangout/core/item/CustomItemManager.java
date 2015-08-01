@@ -2,16 +2,20 @@ package com.hangout.core.item;
 
 import java.util.HashMap;
 
-import com.hangout.core.Plugin;
+import org.bukkit.inventory.ItemStack;
+
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class CustomItemManager {
 	
 	private static HashMap<String, CustomItem> items = new HashMap<String, CustomItem>();
 	
 	public static void addItem(CustomItem item){
-		if(!items.containsKey(item.getName())){
-			items.put(item.getName(), item);
-			Plugin.sendDebugMessage("Added custom item: " + item.getName());
+		String name = item.getName();
+		if(!items.containsKey(name)){
+			items.put(name, item);
+			DebugUtils.sendDebugMessage("Added custom item: " + item.getName(), DebugMode.DEBUG);
 		}
 	}
 	
@@ -26,5 +30,20 @@ public class CustomItemManager {
 			return items.get(name);
 		}
 		return null;
+	}
+	
+	public static CustomItem getItem(ItemStack item){
+		if(!item.hasItemMeta()) return null;
+		return getItem(item.getItemMeta().getDisplayName());
+	}
+	
+	public static boolean isCustomItem(ItemStack i){
+		if(!i.hasItemMeta()) return false;
+		
+		String name = i.getItemMeta().getDisplayName();
+		if(items.containsKey(name)){
+			return true;
+		}
+		return false;
 	}
 }

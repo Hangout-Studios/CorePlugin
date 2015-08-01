@@ -1,5 +1,7 @@
 package com.hangout.core;
 
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
+
 public class Config {
 
     public static String host;
@@ -8,7 +10,7 @@ public class Config {
     public static String databaseName;
     
     private static boolean realServer = false;
-    private static boolean debugMode = true;
+    private static DebugMode debugMode = DebugMode.INFO;
 
     public static boolean loadData() {        
         realServer = Plugin.getInstance().getConfig().getBoolean("RealServer", false);
@@ -18,6 +20,8 @@ public class Config {
         username = Plugin.getInstance().getConfig().getString("SQL." + configHost + ".Username");
         password = Plugin.getInstance().getConfig().getString("SQL." + configHost + ".Password");
         databaseName = Plugin.getInstance().getConfig().getString("SQL.Database");
+        
+        debugMode = DebugMode.valueOf(Plugin.getInstance().getConfig().getString("Debug_Mode", "WARNING"));
         return true;
     }
 
@@ -25,7 +29,7 @@ public class Config {
         return realServer;
     }
     
-    public static boolean isDebugMode(){
+    public static DebugMode getDebugMode(){
     	return debugMode;
     }
 }

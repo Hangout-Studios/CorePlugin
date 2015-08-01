@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 import java.util.UUID;
 
 import mkremins.fanciful.FancyMessage;
@@ -13,12 +14,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.joda.time.DateTime;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.chat.ChatManager;
 import com.hangout.core.menu.MenuInventory;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.CommandPreparer;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class HangoutPlayer {
 	
@@ -46,7 +48,8 @@ public class HangoutPlayer {
 	private HashMap<String, CommandPreparer> commands = new HashMap<String, CommandPreparer>();
 	private HashMap<String, Integer> commandKeys = new HashMap<String, Integer>();
 	
-	private MenuInventory openMenu = null;
+	private Stack<MenuInventory> openMenu = new Stack<MenuInventory>();
+	private boolean isInInventory = false;
 	
 	private HashMap<String, Boolean> loadingProgress = new HashMap<String, Boolean>();
 	
@@ -62,6 +65,8 @@ public class HangoutPlayer {
 	}
 	
 	public Player getPlayer(){
+		if(p == null) return null;
+		
 		if(p.isOnline()){
 			return p;
 		}
@@ -84,16 +89,41 @@ public class HangoutPlayer {
 		return ChatColor.RED + getName();
 	}
 	
-	public void setOpenMenu(MenuInventory menu){
-		openMenu = menu;
+	public void addOpenMenu(MenuInventory menu, boolean replace){
+		if(replace) openMenu.pop();
+		openMenu.push(menu);
 	}
 	
 	public MenuInventory getOpenMenu(){
-		return openMenu;
+		if(openMenu.isEmpty()) return null;
+		return openMenu.peek();
+	}
+	
+	public MenuInventory getLastMenu(){
+		openMenu.pop();
+		return openMenu.peek();
+	}
+	
+	public boolean hasLastMenu(int size){
+		System.out.print("Stack size: " + openMenu.size());
+		if(openMenu.size() < size) return false;
+		return true;
+	}
+	
+	public void clearMenuStack(){
+		openMenu.clear();
 	}
 	
 	public boolean isInMenu(){
 		return getOpenMenu() != null;
+	}
+	
+	public boolean isInInventory(){
+		return isInInventory;
+	}
+	
+	public void setInInventory(boolean b){
+		this.isInInventory = b;
 	}
 	
 	public boolean isOnline(){
@@ -191,6 +221,7 @@ public class HangoutPlayer {
 	/*
 	 * Friends
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean addFriend(HangoutPlayer p, boolean executeDatabaseCommand){
 		if(p == this){
 			return false;
@@ -198,19 +229,48 @@ public class HangoutPlayer {
 		
 		if(!friends.contains(p)){
 			friends.add(p);
-			Plugin.sendDebugMessage(this.getName() + " has added " + p.getName() + " as friend");
-			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), true);
+			
+			if(executeDatabaseCommand){
+				Database.executeFriendAction(id, p.getUUID(), true);
+				
+				HashMap<String, Object> nameConfig = p.getClickableNameConfig(this);
+				
+				new FancyMessage("You have added ")
+					.then((String)nameConfig.get("text"))
+						.color((ChatColor)nameConfig.get("color"))
+						.style((ChatColor[])nameConfig.get("styles"))
+						.command((String)nameConfig.get("command"))
+						.tooltip((List<String>)nameConfig.get("tooltip"))
+					.then(" as friend!")
+					.send(getPlayer());
+				
+				DebugUtils.sendDebugMessage(this.getName() + " has added " + p.getName() + " as friend", DebugMode.DEBUG);
+			}
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean removeFriend(HangoutPlayer p, boolean executeDatabaseCommand){
 		if(friends.contains(p)){
 			friends.remove(p);
-			Plugin.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend");
-			if(executeDatabaseCommand) Database.executeFriendAction(id, p.getUUID(), false);
+			
+			if(executeDatabaseCommand){
+				Database.executeFriendAction(id, p.getUUID(), false);
+				HashMap<String, Object> nameConfig = p.getClickableNameConfig(this);
+				
+				new FancyMessage("You have removed ")
+					.then((String)nameConfig.get("text"))
+						.color((ChatColor)nameConfig.get("color"))
+						.style((ChatColor[])nameConfig.get("styles"))
+						.command((String)nameConfig.get("command"))
+						.tooltip((List<String>)nameConfig.get("tooltip"))
+					.then(" as friend.")
+					.send(getPlayer());
+				DebugUtils.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend", DebugMode.DEBUG);
+			}
 			p.attemptRemove();
 			return true;
 		}else{
@@ -254,7 +314,7 @@ public class HangoutPlayer {
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "MUTE");
 		}
 		
-		Plugin.sendDebugMessage(adminP.getName() + " has muted " + this.getName() + " for " + time + " because: " + reason);
+		DebugUtils.sendDebugMessage(adminP.getName() + " has muted " + this.getName() + " for " + time + " because: " + reason, DebugMode.INFO);
 	}
 	
 	public boolean isBanned(){
@@ -275,7 +335,7 @@ public class HangoutPlayer {
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), time, reason, "BAN");
 		}
 		
-		Plugin.sendDebugMessage(adminP.getName() + " has banned " + this.getName() + " for " + time + " because: " + reason);
+		DebugUtils.sendDebugMessage(adminP.getName() + " has banned " + this.getName() + " for " + time + " because: " + reason, DebugMode.INFO);
 	}
 	
 	public void kick(String reason, HangoutPlayer adminP, boolean commitToDatabase){
@@ -287,7 +347,7 @@ public class HangoutPlayer {
 		p.kickPlayer(fullMessage);
 		
 		if(commitToDatabase){
-			Plugin.sendDebugMessage(adminP.getName() + " has kicked " + this.getName() + " because: " + reason);
+			DebugUtils.sendDebugMessage(adminP.getName() + " has kicked " + this.getName() + " because: " + reason, DebugMode.INFO);
 			Database.executeAdminAction(this.getUUID(), adminP.getUUID(), 0, reason, "KICK");
 		}
 	}
@@ -346,6 +406,7 @@ public class HangoutPlayer {
 	
 	public void setChatChannel(ChatChannel c){
 		channel = c;
+		getPlayer().sendMessage("You are now chatting in channel: " + channel.getDisplayName());
 	}
 	
 	public List<ChatChannel> getSubscribedChannels(){
@@ -355,12 +416,14 @@ public class HangoutPlayer {
 	public void removeSubscribedChannel(ChatChannel c){
 		if(subscribedChannels.contains(c)){
 			subscribedChannels.remove(c);
+			getPlayer().sendMessage("You stopped listening to channel: " + c.getDisplayName());
 		}
 	}
 	
 	public void addSubscribedChannel(ChatChannel c){
 		if(!subscribedChannels.contains(c)){
 			subscribedChannels.add(c);
+			getPlayer().sendMessage("You started listening to channel: " + c.getDisplayName());
 		}
 	}
 	
@@ -402,6 +465,14 @@ public class HangoutPlayer {
 	
 	public void setPvpEnabled(boolean b){
 		pvpEnabled = b;
+		
+		if(getPlayer() == null) return;
+		
+		if(b){
+			getPlayer().sendMessage("You have enabled PvP!");
+		}else{
+			getPlayer().sendMessage("You have disabled PvP!");
+		}
 	}
 	
 	public boolean isPvpEnabled(){
@@ -411,7 +482,7 @@ public class HangoutPlayer {
 	public void modifyGold(int gold, String source, boolean commitToDatabase){
 		this.gold += gold;
 		
-		Plugin.sendDebugMessage(getName() + " got " + gold + " from " + source);
+		DebugUtils.sendDebugMessage(getName() + " got " + gold + " from " + source, DebugMode.DEBUG);
 		if(commitToDatabase){
 			Database.executeGoldAction(getUUID(), gold, source);
 		}

@@ -7,9 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.hangout.core.chat.ChatManager;
 import com.hangout.core.chat.ChatChannel.ChatChannelType;
+import com.hangout.core.chat.ChatManager;
 import com.hangout.core.commands.AdminCommand;
+import com.hangout.core.commands.ChatChannelCommand;
 import com.hangout.core.commands.MuteCommand;
 import com.hangout.core.commands.ReportCommand;
 import com.hangout.core.commands.TextCommand;
@@ -53,6 +54,7 @@ public class Plugin extends JavaPlugin {
 		this.getCommand("report").setExecutor(new ReportCommand());
 		this.getCommand("mute").setExecutor(new MuteCommand());
 		this.getCommand("unmute").setExecutor(new MuteCommand());
+		this.getCommand("channel").setExecutor(new ChatChannelCommand());
 		
 		//Add custom loading properties
 		Database.addCustomPlayerProperty("name", PropertyTypes.STRING);
@@ -60,14 +62,14 @@ public class Plugin extends JavaPlugin {
 		
 		//Create some custom items
 		ItemStack menuItem = ItemUtils.createItem(Material.PAPER, "Open interface", Arrays.asList("Right click to use"));
-		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false));
+		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false, false));
 		HangoutPlayerManager.addStandardLoadoutItem(menuItem, 8);
 		
 		//Add chat channels
-		ChatManager.createChannel("local", "(L)", ChatColor.GRAY + "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL, Material.DIRT);
-		ChatManager.createChannel("area", "(A)", ChatColor.RED + "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION, Material.GRASS);
-		ChatManager.createChannel("global", "(W)", ChatColor.GOLD + "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL, Material.NETHER_STAR);
-		ChatManager.createChannel("whisper", "(w)", ChatColor.LIGHT_PURPLE + "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM);
+		ChatManager.createChannel("local", ChatColor.GRAY + "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL, Material.DIRT, true);
+		ChatManager.createChannel("area", ChatColor.RED + "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION, Material.GRASS, true);
+		ChatManager.createChannel("world", ChatColor.GOLD + "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL, Material.NETHER_STAR, true);
+		ChatManager.createChannel("whisper", ChatColor.LIGHT_PURPLE + "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM, false);
 	}
 	
 	public void onDisable(){
@@ -88,11 +90,5 @@ public class Plugin extends JavaPlugin {
         } else {
             return ChatColor.translateAlternateColorCodes('&', message.replace("%&", " "));
         }
-	}
-	
-	public static void sendDebugMessage(String s){
-		if(Config.isDebugMode()){
-			System.out.print(s);
-		}
 	}
 }

@@ -1,5 +1,6 @@
 locale: en
 RealServer: false
+Debug_Mode: INFO
 SQL:
   Database: server_hangout
   Hangout:

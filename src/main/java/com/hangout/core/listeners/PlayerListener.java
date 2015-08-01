@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.joda.time.DateTime;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.events.PlayerJoinCompleteEvent;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
@@ -25,6 +24,8 @@ import com.hangout.core.player.HangoutPlayer.PlayerState;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.hologram.HologramManager;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class PlayerListener implements Listener {
 	
@@ -41,7 +42,7 @@ public class PlayerListener implements Listener {
 		//We don't have to wait for this, since it's loaded when the player is created
 		if(hp.isBanned()){
 			e.disallow(Result.KICK_BANNED, "You are banned. Time left: " + hp.getViolationReport().getTimeLeftBanned());
-			Plugin.sendDebugMessage("Player " + playerName + " tried logging on, but is banned");
+			DebugUtils.sendDebugMessage("Player " + playerName + " tried logging on, but is banned", DebugMode.INFO);
 			HangoutPlayerManager.removePlayer(hp);
 			return;
 		}
@@ -56,13 +57,13 @@ public class PlayerListener implements Listener {
 		hp.setPlayer(e.getPlayer());
 		hp.setPlayerState(PlayerState.COMPLETED);
 		hp.resetChatChannels();
-		Plugin.sendDebugMessage("Player logged in and linked: " + hp.getName());						
+		DebugUtils.sendDebugMessage("Player logged in and linked: " + hp.getName(), DebugMode.DEBUG);						
 		Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinCompleteEvent(hp));
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerLoadComplete(PlayerJoinCompleteEvent e){
-		e.getPlayer().reset();
+		//e.getPlayer().reset();
 		
 		for(Player p : Bukkit.getOnlinePlayers()){
 			HangoutPlayer otherP = HangoutPlayerManager.getPlayer(p);
@@ -85,7 +86,7 @@ public class PlayerListener implements Listener {
 		
 		HangoutPlayer p = HangoutPlayerManager.getPlayer(e.getPlayer());
 		if(p == null){
-			Plugin.sendDebugMessage("Tried to save player " + e.getPlayer().getName() + " but hangoutplayer wasn't found.");
+			DebugUtils.sendDebugMessage("Tried to save player " + e.getPlayer().getName() + " but hangoutplayer wasn't found.", DebugMode.WARNING);
 			return;
 		}
 		

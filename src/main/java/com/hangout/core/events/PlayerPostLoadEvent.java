@@ -5,8 +5,9 @@ import java.util.HashMap;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.hangout.core.Plugin;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.utils.mc.DebugUtils;
+import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
 public class PlayerPostLoadEvent extends Event {
 	
@@ -16,9 +17,9 @@ public class PlayerPostLoadEvent extends Event {
 		this.p = p;
 		this.propertyMap = propertyMap;
 		
-		Plugin.sendDebugMessage("Properties loaded:");
+		DebugUtils.sendDebugMessage("Properties loaded:", DebugMode.COMPLETE);
 		for(String key : propertyMap.keySet()){
-			Plugin.sendDebugMessage("Key: " + key + ", value: " + propertyMap.get(key));
+			DebugUtils.sendDebugMessage("Key: " + key + ", value: " + propertyMap.get(key), DebugMode.COMPLETE);
 		}
 	}
 	

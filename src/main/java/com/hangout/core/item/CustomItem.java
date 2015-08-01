@@ -12,13 +12,15 @@ public class CustomItem {
 	private boolean allowItemClick = false;
 	private boolean allowRightClick = true;
 	private boolean dropable = true;
+	private boolean dropOnDeath = true;
 	
-	public CustomItem(ItemStack item, String tag, boolean allowItemClick, boolean allowRightClick, boolean dropable){
+	public CustomItem(ItemStack item, String tag, boolean allowItemClick, boolean allowRightClick, boolean dropable, boolean dropOnDeath){
 		this.item = item;
 		this.tag = tag;
 		this.allowItemClick = allowItemClick;
 		this.allowRightClick = allowRightClick;
 		this.dropable = dropable;
+		this.dropOnDeath = dropOnDeath;
 	}
 	
 	public ItemStack getItemStack(){
@@ -51,5 +53,9 @@ public class CustomItem {
 	
 	public boolean allowDrop(){
 		return dropable;
+	}
+	
+	public boolean allowDropOnDeath(){
+		return dropOnDeath;
 	}
 }

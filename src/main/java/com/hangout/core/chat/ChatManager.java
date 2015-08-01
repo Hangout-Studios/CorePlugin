@@ -25,9 +25,9 @@ public class ChatManager {
 		return null;
 	}
 	
-	public static ChatChannel createChannel(String tag, String displayTag, String displayName, List<String> description, ChatChannelType type, Material mat){
-		ChatChannel c = new ChatChannel(tag, displayTag, displayName, description, type, mat);
-		channels.put(tag, c);
+	public static ChatChannel createChannel(String tag, String displayName, List<String> description, ChatChannelType type, Material mat, boolean isSelectable){
+		ChatChannel c = new ChatChannel(tag, displayName, description, type, mat, isSelectable);
+		channels.put(tag, c);		
 		return c;
 	}
 	

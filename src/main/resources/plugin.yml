@@ -17,3 +17,7 @@ commands:
   unmute:
     description: Commands for unmuting a player
     usage: "/unmute <player>"
+  channel:
+    description: Commands for managing chat channel
+    usage: "/channel <channel name>"
+    aliases: c
