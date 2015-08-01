@@ -62,11 +62,11 @@ public class MenuListener implements Listener {
 			if(channel == null) return;
 			
 			if(command.equals("subscribe")){
-				p.addSubscribedChannel(channel);
+				p.addSubscribedChannel(channel, true);
 			}else if(command.equals("unsubscribe")){
-				p.removeSubscribedChannel(channel);
+				p.removeSubscribedChannel(channel, true);
 			}else if(command.equals("setactive")){
-				p.setChatChannel(channel);
+				p.setChatChannel(channel, true);
 			}
 			
 			if(command != "description"){

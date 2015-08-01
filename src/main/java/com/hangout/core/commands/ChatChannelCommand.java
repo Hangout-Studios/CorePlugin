@@ -35,7 +35,7 @@ public class ChatChannelCommand  implements CommandExecutor {
 			return false;
 		}
 		
-		p.setChatChannel(channel);
+		p.setChatChannel(channel, true);
 		return true;
 	}
 

@@ -66,10 +66,11 @@ public class Plugin extends JavaPlugin {
 		HangoutPlayerManager.addStandardLoadoutItem(menuItem, 8);
 		
 		//Add chat channels
-		ChatManager.createChannel("local", ChatColor.GRAY + "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL, Material.DIRT, true);
-		ChatManager.createChannel("area", ChatColor.RED + "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION, Material.GRASS, true);
-		ChatManager.createChannel("world", ChatColor.GOLD + "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL, Material.NETHER_STAR, true);
-		ChatManager.createChannel("whisper", ChatColor.LIGHT_PURPLE + "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM, false);
+		ChatManager.createChannel("local", ChatColor.GRAY + "Local", Arrays.asList("Local chat only works in", "a certain around the area,", "like it would in real life."), ChatChannelType.LOCAL, Material.DIRT, true, true);
+		ChatManager.createChannel("area", ChatColor.RED + "Area", Arrays.asList("Area chat works in a", "declared area, such as", "a city or wilderness zone."), ChatChannelType.REGION, Material.GRASS, true, true);
+		ChatManager.createChannel("world", ChatColor.GOLD + "World", Arrays.asList("World chat is server-wide."), ChatChannelType.GLOBAL, Material.NETHER_STAR, true, true);
+		ChatManager.createChannel("whisper", ChatColor.LIGHT_PURPLE + "Whisper", Arrays.asList("Personal messages from", "other players."), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM, false, true);
+		ChatManager.createChannel("system", ""+ ChatColor.BLUE + ChatColor.BOLD + "SERVER", Arrays.asList("System messages"), ChatChannelType.SERVER_WIDE, Material.SKULL_ITEM, false, false);
 	}
 	
 	public void onDisable(){

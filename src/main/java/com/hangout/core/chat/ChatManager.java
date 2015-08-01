@@ -25,8 +25,9 @@ public class ChatManager {
 		return null;
 	}
 	
-	public static ChatChannel createChannel(String tag, String displayName, List<String> description, ChatChannelType type, Material mat, boolean isSelectable){
-		ChatChannel c = new ChatChannel(tag, displayName, description, type, mat, isSelectable);
+	public static ChatChannel createChannel(String tag, String displayName, List<String> description,
+			ChatChannelType type, Material mat, boolean isSelectable, boolean isMutable){
+		ChatChannel c = new ChatChannel(tag, displayName, description, type, mat, isSelectable, isMutable);
 		channels.put(tag, c);		
 		return c;
 	}
@@ -74,7 +75,7 @@ public class ChatManager {
 		for(HangoutPlayer otherP : players){
 			if(otherP.getMutedPlayers().contains(p.getUUID()) || !otherP.isSubscribedToChannel(channel)) continue;
 			
-			p.getClickableName(otherP, true)
+			p.getClickableName(otherP, true, false)
 				.then(" > ")
 					.color(ChatColor.WHITE)
 					.style(ChatColor.BOLD)

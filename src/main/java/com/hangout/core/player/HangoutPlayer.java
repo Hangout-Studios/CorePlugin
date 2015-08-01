@@ -147,38 +147,23 @@ public class HangoutPlayer {
 		tooltipDescription = desc;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public FancyMessage getClickableName(HangoutPlayer toPlayer, boolean addChatTag){
+	public FancyMessage getClickableName(HangoutPlayer toPlayer, boolean addChatTag, boolean addClanTag){
 		FancyMessage message = new FancyMessage("");
 		
 		if(addChatTag){
 			message.then(getChatChannel().getDisplayName() + ChatColor.WHITE + " ");
 		}
 		
-		HashMap<String, Object> nameConfig =  getClickableNameConfig(toPlayer);
-		
-		return message
-			.then((String)nameConfig.get("text"))
-				.color((ChatColor)nameConfig.get("color"))
-				.style((ChatColor[])nameConfig.get("styles"))
-				.command((String)nameConfig.get("command"))
-			.tooltip((List<String>)nameConfig.get("tooltip"));
+		return addClickableName(message, toPlayer);
 	}
 	
-	public HashMap<String, Object> getClickableNameConfig(HangoutPlayer toPlayer){
-		HashMap<String, Object> h = new HashMap<String, Object>();
-		
-		ChatColor[] styles = new ChatColor[2];
-		styles[0] = ChatColor.ITALIC;
-		styles[1] = ChatColor.BOLD;
-		
-		h.put("text", getDisplayName());
-		h.put("color", ChatColor.GOLD);
-		h.put("styles", styles);
-		h.put("command", "/text player " + getName() + " " + toPlayer.getName());
-		h.put("tooltip", getDescription());
-		return h;
-		
+	public FancyMessage addClickableName(FancyMessage message, HangoutPlayer toPlayer){
+		return message
+			.then(getDisplayName())
+				.color(ChatColor.GOLD)
+				.style(ChatColor.ITALIC, ChatColor.BOLD)
+				.command("/text player " + getName() + " " + toPlayer.getName())
+			.tooltip(getDescription());
 	}
 	
 	public DateTime getLastOnline(){
@@ -221,7 +206,6 @@ public class HangoutPlayer {
 	/*
 	 * Friends
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean addFriend(HangoutPlayer p, boolean executeDatabaseCommand){
 		if(p == this){
 			return false;
@@ -233,14 +217,7 @@ public class HangoutPlayer {
 			if(executeDatabaseCommand){
 				Database.executeFriendAction(id, p.getUUID(), true);
 				
-				HashMap<String, Object> nameConfig = p.getClickableNameConfig(this);
-				
-				new FancyMessage("You have added ")
-					.then((String)nameConfig.get("text"))
-						.color((ChatColor)nameConfig.get("color"))
-						.style((ChatColor[])nameConfig.get("styles"))
-						.command((String)nameConfig.get("command"))
-						.tooltip((List<String>)nameConfig.get("tooltip"))
+				p.addClickableName(new FancyMessage("You have added "), this)
 					.then(" as friend!")
 					.send(getPlayer());
 				
@@ -252,22 +229,15 @@ public class HangoutPlayer {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean removeFriend(HangoutPlayer p, boolean executeDatabaseCommand){
 		if(friends.contains(p)){
 			friends.remove(p);
 			
 			if(executeDatabaseCommand){
 				Database.executeFriendAction(id, p.getUUID(), false);
-				HashMap<String, Object> nameConfig = p.getClickableNameConfig(this);
 				
-				new FancyMessage("You have removed ")
-					.then((String)nameConfig.get("text"))
-						.color((ChatColor)nameConfig.get("color"))
-						.style((ChatColor[])nameConfig.get("styles"))
-						.command((String)nameConfig.get("command"))
-						.tooltip((List<String>)nameConfig.get("tooltip"))
-					.then(" as friend.")
+				addClickableName(new FancyMessage("You have removed "), p)
+						.then(" as friend.")
 					.send(getPlayer());
 				DebugUtils.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend", DebugMode.DEBUG);
 			}
@@ -282,8 +252,8 @@ public class HangoutPlayer {
 		friends = list;
 	}
 	
-	public boolean isFriend(UUID id){
-		if(friends.contains(id)){
+	public boolean isFriend(HangoutPlayer friend){
+		if(friends.contains(friend)){
 			return true;
 		}
 		return false;
@@ -397,33 +367,45 @@ public class HangoutPlayer {
 	
 	public void resetChatChannels(){
 		subscribedChannels = ChatManager.getChannels();
-		channel = subscribedChannels.get(0);
+		channel = ChatManager.getChannel("world");
 	}
 	
 	public ChatChannel getChatChannel(){
 		return channel;
 	}
 	
-	public void setChatChannel(ChatChannel c){
+	public void setChatChannel(ChatChannel c, boolean commitToDatabase){
 		channel = c;
 		getPlayer().sendMessage("You are now chatting in channel: " + channel.getDisplayName());
+		
+		if(commitToDatabase){
+			Database.executeChatChannelAction(getUUID(), c, "CHAT");
+		}
 	}
 	
 	public List<ChatChannel> getSubscribedChannels(){
 		return subscribedChannels;
 	}
 	
-	public void removeSubscribedChannel(ChatChannel c){
+	public void removeSubscribedChannel(ChatChannel c, boolean commitToDatabase){
 		if(subscribedChannels.contains(c)){
 			subscribedChannels.remove(c);
 			getPlayer().sendMessage("You stopped listening to channel: " + c.getDisplayName());
+			
+			if(commitToDatabase){
+				Database.executeChatChannelAction(getUUID(), c, "MUTE");
+			}
 		}
 	}
 	
-	public void addSubscribedChannel(ChatChannel c){
+	public void addSubscribedChannel(ChatChannel c, boolean commitToDatabase){
 		if(!subscribedChannels.contains(c)){
 			subscribedChannels.add(c);
 			getPlayer().sendMessage("You started listening to channel: " + c.getDisplayName());
+			
+			if(commitToDatabase){
+				Database.executeChatChannelAction(getUUID(), c, "UNMUTE");
+			}
 		}
 	}
 	
@@ -505,7 +487,7 @@ public class HangoutPlayer {
 		return null;
 	}
 	
-	public void clearComandPreparer(String tag){
+	public void clearCommandPreparer(String tag){
 		if(commands.containsKey(tag)){
 			commands.remove(tag);
 		}

@@ -68,7 +68,7 @@ public class PlayerListener implements Listener {
 		for(Player p : Bukkit.getOnlinePlayers()){
 			HangoutPlayer otherP = HangoutPlayerManager.getPlayer(p);
 			
-			e.getPlayer().getClickableName(otherP, false)
+			e.getPlayer().getClickableName(otherP, false, false)
 				.then(" has entered the realm.")
 			.send(otherP.getPlayer());
 		}

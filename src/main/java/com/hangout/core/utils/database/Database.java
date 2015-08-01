@@ -15,6 +15,8 @@ import org.bukkit.Bukkit;
 import org.joda.time.DateTime;
 
 import com.hangout.core.Config;
+import com.hangout.core.chat.ChatChannel;
+import com.hangout.core.chat.ChatManager;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
 import com.hangout.core.player.HangoutPlayer;
@@ -288,7 +290,31 @@ public class Database {
 			pst.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}	
+		}
+		
+		//Load channels
+		try (PreparedStatement pst = Database.getConnection().prepareStatement(
+				"SELECT action, channel FROM " + Config.databaseName + ".chatchannel_action WHERE player_id = ? ORDER BY action_id ASC;")) {
+			pst.setString(1, id.toString());
+			ResultSet rs = pst.executeQuery();
+			
+			while(rs.next()){
+				ChatChannel channel = ChatManager.getChannel(rs.getString("channel"));
+				String action = rs.getString("action");
+				
+				if(action.equals("MUTE")){
+					hp.removeSubscribedChannel(channel, false);
+				}else if(action.equals("UNMUTE")){
+					hp.addSubscribedChannel(channel, false);
+				}else if(action.equals("CHAT")){
+					hp.setChatChannel(channel, false);
+				}
+			}
+
+			pst.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     	
     	hp.setPlayerState(PlayerState.UNLINKED);
     	
@@ -388,6 +414,17 @@ public class Database {
     	secondary.put("source", source);
     	
     	saveToDatabase("gold_action", primary, secondary);
+	}
+	
+	public static void executeChatChannelAction(UUID playerID, ChatChannel channel, String action){
+		HashMap<String, Object> primary = new HashMap<String, Object>();
+    	HashMap<String, Object> secondary = new HashMap<String, Object>();
+    	
+    	secondary.put("player_id", playerID.toString());
+    	secondary.put("channel", channel.getTag());
+    	secondary.put("action", action);
+    	
+    	saveToDatabase("chatchannel_action", primary, secondary);
 	}
     
     public static void saveToDatabase(String table, HashMap<String, Object> primary, HashMap<String, Object> secondary){
