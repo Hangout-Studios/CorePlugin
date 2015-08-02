@@ -1,5 +1,6 @@
 package com.hangout.core.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.hangout.core.Plugin;
 import com.hangout.core.item.CustomItem;
 import com.hangout.core.item.CustomItemManager;
 import com.hangout.core.player.HangoutPlayer;
@@ -26,7 +28,7 @@ public class BattleListener implements Listener {
 			hitP = (Player)e.getEntity();
 		}
 		
-		if(e.getEntity() instanceof Player){
+		if(e.getDamager() instanceof Player){
 			damagerP = (Player)e.getDamager();
 		}
 		
@@ -67,6 +69,14 @@ public class BattleListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent e){
-		HangoutPlayerManager.getPlayer(e.getPlayer()).reset();
+		final Player p = e.getPlayer();
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), new Runnable(){
+
+			@Override
+			public void run() {
+				HangoutPlayerManager.getPlayer(p).reset();
+			}
+			
+		}, 1L);
 	}
 }

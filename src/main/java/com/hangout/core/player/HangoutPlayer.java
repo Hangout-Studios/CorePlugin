@@ -41,7 +41,7 @@ public class HangoutPlayer {
 	private ViolationReport violations = new ViolationReport();
 	private List<PlayerRank> ranks = new ArrayList<PlayerRank>();
 	private ChatChannel channel;
-	private List<ChatChannel> subscribedChannels;
+	private List<ChatChannel> subscribedChannels = new ArrayList<ChatChannel>();
 	private List<UUID> mutedPlayers = new ArrayList<UUID>();
 	private boolean pvpEnabled = false;
 	private int gold = 0;
@@ -57,11 +57,14 @@ public class HangoutPlayer {
 		this.p = p;
 		id = p.getUniqueId();
 		name = p.getName();
+		
+		resetChatChannels();
 	}
 	
 	public HangoutPlayer(UUID id, String name){
 		this.id = id;
 		this.name = name;
+		resetChatChannels();
 	}
 	
 	public Player getPlayer(){
@@ -236,7 +239,7 @@ public class HangoutPlayer {
 			if(executeDatabaseCommand){
 				Database.executeFriendAction(id, p.getUUID(), false);
 				
-				addClickableName(new FancyMessage("You have removed "), p)
+				p.addClickableName(new FancyMessage("You have removed "), this)
 						.then(" as friend.")
 					.send(getPlayer());
 				DebugUtils.sendDebugMessage(this.getName() + " has removed " + p.getName() + " as friend", DebugMode.DEBUG);
@@ -367,7 +370,7 @@ public class HangoutPlayer {
 	
 	public void resetChatChannels(){
 		subscribedChannels = ChatManager.getChannels();
-		channel = ChatManager.getChannel("world");
+		channel = ChatManager.getChannel("core", "world");
 	}
 	
 	public ChatChannel getChatChannel(){
@@ -376,10 +379,10 @@ public class HangoutPlayer {
 	
 	public void setChatChannel(ChatChannel c, boolean commitToDatabase){
 		channel = c;
-		getPlayer().sendMessage("You are now chatting in channel: " + channel.getDisplayName());
 		
 		if(commitToDatabase){
 			Database.executeChatChannelAction(getUUID(), c, "CHAT");
+			getPlayer().sendMessage("You are now chatting in channel: " + channel.getDisplayName());
 		}
 	}
 	
@@ -390,10 +393,10 @@ public class HangoutPlayer {
 	public void removeSubscribedChannel(ChatChannel c, boolean commitToDatabase){
 		if(subscribedChannels.contains(c)){
 			subscribedChannels.remove(c);
-			getPlayer().sendMessage("You stopped listening to channel: " + c.getDisplayName());
 			
 			if(commitToDatabase){
 				Database.executeChatChannelAction(getUUID(), c, "MUTE");
+				getPlayer().sendMessage("You stopped listening to channel: " + c.getDisplayName());
 			}
 		}
 	}
@@ -401,10 +404,10 @@ public class HangoutPlayer {
 	public void addSubscribedChannel(ChatChannel c, boolean commitToDatabase){
 		if(!subscribedChannels.contains(c)){
 			subscribedChannels.add(c);
-			getPlayer().sendMessage("You started listening to channel: " + c.getDisplayName());
 			
 			if(commitToDatabase){
 				Database.executeChatChannelAction(getUUID(), c, "UNMUTE");
+				getPlayer().sendMessage("You started listening to channel: " + c.getDisplayName());
 			}
 		}
 	}

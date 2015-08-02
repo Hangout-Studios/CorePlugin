@@ -12,9 +12,12 @@ public class ChatListener implements Listener {
 	
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent e){
+		e.setCancelled(true);
+		
 		HangoutPlayer p = HangoutPlayerManager.getPlayer(e.getPlayer());
+		if(!p.getChatChannel().getPlugin().equals("core")) return;
+		
 		String message = e.getMessage();
 		ChatManager.sendMessage(p, message, p.getChatChannel(), null);
-		e.setCancelled(true);
 	}
 }

@@ -10,7 +10,7 @@ import com.hangout.core.chat.ChatManager;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 
-public class ChatChannelCommand  implements CommandExecutor {
+public class ChannelCommand  implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
@@ -20,7 +20,7 @@ public class ChatChannelCommand  implements CommandExecutor {
 		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)sender);
 		
 		String channelTag = args[0].toLowerCase();
-		ChatChannel channel = ChatManager.getChannel(channelTag);
+		ChatChannel channel = ChatManager.getChannel("core", channelTag);
 		if(channel == null){
 			for(ChatChannel c : ChatManager.getChannels()){
 				if(!c.isSelectable()) continue;

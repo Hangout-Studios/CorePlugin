@@ -57,7 +57,7 @@ public class MenuListener implements Listener {
 			String[] split = e.getItem().getTag().split("_");
 			
 			String command = split[1];
-			ChatChannel channel = ChatManager.getChannel(split[2]);
+			ChatChannel channel = ChatManager.getChannel(split[2], split[3]);
 			
 			if(channel == null) return;
 			

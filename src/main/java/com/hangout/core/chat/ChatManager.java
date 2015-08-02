@@ -16,24 +16,42 @@ import com.hangout.core.player.HangoutPlayerManager;
 
 public class ChatManager {
 	
-	private static HashMap<String, ChatChannel> channels = new HashMap<String, ChatChannel>();
+	private static List<ChatChannel> channels = new ArrayList<ChatChannel>();
+	private static HashMap<String, HashMap<String, ChatChannel>> channelMap = new HashMap<String, HashMap<String, ChatChannel>>();
 	
-	public static ChatChannel getChannel(String s){
-		if(channels.containsKey(s)){
-			return channels.get(s);
+	public static ChatChannel getChannel(String plugin, String s){
+		if(channelMap.containsKey(plugin) && channelMap.get(plugin).containsKey(s)){
+			return channelMap.get(plugin).get(s);
 		}
 		return null;
 	}
 	
-	public static ChatChannel createChannel(String tag, String displayName, List<String> description,
+	public static ChatChannel createChannel(String plugin, String tag, String displayName, List<String> description,
 			ChatChannelType type, Material mat, boolean isSelectable, boolean isMutable){
-		ChatChannel c = new ChatChannel(tag, displayName, description, type, mat, isSelectable, isMutable);
-		channels.put(tag, c);		
+		ChatChannel c = new ChatChannel(tag, displayName, description, type, mat, isSelectable, isMutable, plugin);
+		
+		HashMap<String, ChatChannel> pluginMap = null;
+		if(channelMap.containsKey(plugin)){
+			pluginMap = channelMap.get(plugin);
+		}else{
+			pluginMap = new HashMap<String, ChatChannel>();
+		}
+		
+		pluginMap.put(tag, c);
+		channelMap.put(plugin, pluginMap);
+		channels.add(c);
 		return c;
 	}
 	
 	public static List<ChatChannel> getChannels(){
-		return new ArrayList<ChatChannel>(channels.values());
+		return new ArrayList<ChatChannel>(channels);
+	}
+	
+	public static List<ChatChannel> getChannels(String plugin){
+		if(channelMap.containsKey(plugin)){
+			return new ArrayList<ChatChannel>(channelMap.get(plugin).values());
+		}
+		return new ArrayList<ChatChannel>();
 	}
 	
 	public static void sendMessage(HangoutPlayer p, String message, ChatChannel channel, List<HangoutPlayer> receivers){

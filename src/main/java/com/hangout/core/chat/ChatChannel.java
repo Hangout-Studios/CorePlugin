@@ -20,8 +20,9 @@ public class ChatChannel {
 	private Material mat;
 	private boolean isSelectable = true;
 	private boolean isMutable = false;
+	private String plugin;
 	
-	ChatChannel(String tag, String displayName, List<String> description, ChatChannelType type, Material mat, boolean isSelectable, boolean isMutable){
+	ChatChannel(String tag, String displayName, List<String> description, ChatChannelType type, Material mat, boolean isSelectable, boolean isMutable, String plugin){
 		this.tag = tag;
 		this.displayName = displayName;
 		this.description = description;
@@ -29,10 +30,15 @@ public class ChatChannel {
 		this.mat = mat;
 		this.isSelectable = isSelectable;
 		this.isMutable = isMutable;
+		this.plugin = plugin;
 	}
 	
 	public String getTag(){
 		return tag;
+	}
+	
+	public String getFullTag(){
+		return plugin + "_" + tag;
 	}
 	
 	public String getDisplayName(){
@@ -57,5 +63,9 @@ public class ChatChannel {
 	
 	public boolean isMutable(){
 		return isMutable;
+	}
+	
+	public String getPlugin(){
+		return plugin;
 	}
 }

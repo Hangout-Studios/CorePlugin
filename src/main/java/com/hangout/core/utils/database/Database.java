@@ -299,7 +299,8 @@ public class Database {
 			ResultSet rs = pst.executeQuery();
 			
 			while(rs.next()){
-				ChatChannel channel = ChatManager.getChannel(rs.getString("channel"));
+				String[] channelSplit = rs.getString("channel").split("_");
+				ChatChannel channel = ChatManager.getChannel(channelSplit[0], channelSplit[1]);
 				String action = rs.getString("action");
 				
 				if(action.equals("MUTE")){
@@ -421,7 +422,7 @@ public class Database {
     	HashMap<String, Object> secondary = new HashMap<String, Object>();
     	
     	secondary.put("player_id", playerID.toString());
-    	secondary.put("channel", channel.getTag());
+    	secondary.put("channel", channel.getFullTag());
     	secondary.put("action", action);
     	
     	saveToDatabase("chatchannel_action", primary, secondary);

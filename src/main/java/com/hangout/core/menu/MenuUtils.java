@@ -37,7 +37,7 @@ public class MenuUtils {
 		MenuItem menuItem = new MenuItem(item, itemTag);
 		menu.addMenuItem(menuItem, menuPosition);
 		
-		System.out.print("Put item " + itemTag + " at " + menuPosition);
+		DebugUtils.sendDebugMessage("Put item " + itemTag + " at " + menuPosition, DebugMode.EXTENSIVE);
 		return menuItem;
 	}
 	
@@ -61,22 +61,22 @@ public class MenuUtils {
 			createMenuItem(inventory, c.getMaterial(), c.getDisplayName(), c.getDescription(), 0 + channelCount, "channel_description_" + c.getDisplayName());
 			if(c.isMutable()){
 				if(isSubscribed){
-					createMenuItem(inventory, Material.DETECTOR_RAIL, "Channel active - " + c.getDisplayName(), Arrays.asList("Click to stop listening."), 9 + channelCount, "channel_unsubscribe_" + c.getTag());
+					createMenuItem(inventory, Material.DETECTOR_RAIL, "Channel active - " + c.getDisplayName(), Arrays.asList("Click to stop listening."), 9 + channelCount, "channel_unsubscribe_" + c.getFullTag());
 				}else{
-					createMenuItem(inventory, Material.BARRIER, "Channel disabled - " + c.getDisplayName(), Arrays.asList("Click to listen."), 9 + channelCount, "channel_subscribe_" + c.getTag());
+					createMenuItem(inventory, Material.BARRIER, "Channel disabled - " + c.getDisplayName(), Arrays.asList("Click to listen."), 9 + channelCount, "channel_subscribe_" + c.getFullTag());
 				}
 			}else{
-				createMenuItem(inventory, Material.BARRIER, "Blocked - " + c.getDisplayName(), Arrays.asList("You cannot stop listening", "to this channel."), 9 + channelCount, "channel_blocked_" + c.getTag());
+				createMenuItem(inventory, Material.BARRIER, "Blocked - " + c.getDisplayName(), Arrays.asList("You cannot stop listening", "to this channel."), 9 + channelCount, "channel_blocked_" + c.getFullTag());
 			}
 			
 			if(c.isSelectable()){
 				if(isActive){
-					createMenuItem(inventory, Material.DETECTOR_RAIL, "Current channel - " + c.getDisplayName(), Arrays.asList("This is the channel you", "talk to when you chat."), 18 + channelCount, "channel_isactive_" + c.getTag());
+					createMenuItem(inventory, Material.DETECTOR_RAIL, "Current channel - " + c.getDisplayName(), Arrays.asList("This is the channel you", "talk to when you chat."), 18 + channelCount, "channel_isactive_" + c.getFullTag());
 				}else{
-					createMenuItem(inventory, Material.BARRIER, "Not active - " + c.getDisplayName(), Arrays.asList("Click to make this the", "channel you chat in."), 18 + channelCount, "channel_setactive_" + c.getTag());
+					createMenuItem(inventory, Material.BARRIER, "Not active - " + c.getDisplayName(), Arrays.asList("Click to make this the", "channel you chat in."), 18 + channelCount, "channel_setactive_" + c.getFullTag());
 				}
 			}else{
-				createMenuItem(inventory, Material.BARRIER, "Blocked - " + c.getDisplayName(), Arrays.asList("You cannot select this", "channel as active channel."), 18 + channelCount, "channel_blocked_" + c.getTag());
+				createMenuItem(inventory, Material.BARRIER, "Blocked - " + c.getDisplayName(), Arrays.asList("You cannot select this", "channel as active channel."), 18 + channelCount, "channel_blocked_" + c.getFullTag());
 			}
 			
 			channelCount++;

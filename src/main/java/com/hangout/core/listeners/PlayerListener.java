@@ -56,7 +56,6 @@ public class PlayerListener implements Listener {
 		
 		hp.setPlayer(e.getPlayer());
 		hp.setPlayerState(PlayerState.COMPLETED);
-		hp.resetChatChannels();
 		DebugUtils.sendDebugMessage("Player logged in and linked: " + hp.getName(), DebugMode.DEBUG);						
 		Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinCompleteEvent(hp));
 	}
