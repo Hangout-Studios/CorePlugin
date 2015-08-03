@@ -58,7 +58,7 @@ public class MenuUtils {
 			boolean isSubscribed = p.isSubscribedToChannel(c);
 			boolean isActive = p.getChatChannel() == c;
 			
-			createMenuItem(inventory, c.getMaterial(), c.getDisplayName(), c.getDescription(), 0 + channelCount, "channel_description_" + c.getDisplayName());
+			createMenuItem(inventory, c.getMaterial(), c.getDisplayName(), c.getDescription(), 0 + channelCount, "c_description_" + c.getDisplayName());
 			if(c.isMutable()){
 				if(isSubscribed){
 					createMenuItem(inventory, Material.DETECTOR_RAIL, "Channel active - " + c.getDisplayName(), Arrays.asList("Click to stop listening."), 9 + channelCount, "channel_unsubscribe_" + c.getFullTag());

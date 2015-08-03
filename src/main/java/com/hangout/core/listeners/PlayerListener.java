@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.joda.time.DateTime;
 
+import com.hangout.core.events.PlayerDataReleaseEvent;
 import com.hangout.core.events.PlayerJoinCompleteEvent;
 import com.hangout.core.events.PlayerPostLoadEvent;
 import com.hangout.core.events.PlayerPreSaveEvent;
@@ -61,7 +62,7 @@ public class PlayerListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerLoadComplete(PlayerJoinCompleteEvent e){
+	public void onPlayerJoinComplete(PlayerJoinCompleteEvent e){
 		//e.getPlayer().reset();
 		
 		for(Player p : Bukkit.getOnlinePlayers()){
@@ -108,5 +109,13 @@ public class PlayerListener implements Listener {
 		e.savePrimaryProperty("uuid", e.getPlayer().getUUID().toString());
 		e.saveSecondaryProperty("name", e.getPlayer().getPlayer().getName());
 		e.saveSecondaryProperty("last_online", new Timestamp(DateTime.now().getMillis()));
+	}
+	
+	@EventHandler
+	public void onPlayerDataRelease(PlayerDataReleaseEvent e){
+		
+		//Clear player
+		CommonPlayerManager.removePlayer(e.getUUID());			
+		HangoutPlayerManager.removePlayer(e.getPlayer());
 	}
 }

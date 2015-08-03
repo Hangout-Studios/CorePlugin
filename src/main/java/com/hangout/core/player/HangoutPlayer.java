@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import mkremins.fanciful.FancyMessage;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -16,6 +17,7 @@ import org.joda.time.DateTime;
 
 import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.chat.ChatManager;
+import com.hangout.core.events.PlayerDataReleaseEvent;
 import com.hangout.core.menu.MenuInventory;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.CommandPreparer;
@@ -522,11 +524,13 @@ public class HangoutPlayer {
 			}
 		}
 		
-		if(clearToRemove){
-			
-			//Clear player
-			CommonPlayerManager.removePlayer(getUUID());			
-			HangoutPlayerManager.removePlayer(this);
+		CommonPlayerBundle bundle = CommonPlayerManager.getPlayer(getUUID());
+		if(bundle == null || bundle.isInGuild()){
+			clearToRemove = false;
+		}
+		
+		if(clearToRemove){			
+			Bukkit.getPluginManager().callEvent(new PlayerDataReleaseEvent(this));
 		}
 	}
 }

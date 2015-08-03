@@ -64,6 +64,11 @@ public class CommonPlayerBundle {
 		invokeMethod(playerTypes.get("RPG"), "unlockOccupation", classes, values);
 	}
 	
+	public boolean isInGuild(){
+		if(!playerTypes.containsKey("RPG")) return false;
+		return (boolean)invokeMethod(playerTypes.get("RPG"), "isInGuild");
+	}
+	
 	private Object invokeMethod(Object playerObject, String method){		
 		return invokeMethod(playerObject, method, (Class<?>[])null, (Object[])null);
 	}
