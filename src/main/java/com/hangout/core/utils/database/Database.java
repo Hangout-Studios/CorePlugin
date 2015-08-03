@@ -140,22 +140,15 @@ public class Database {
     	
     	//Load friends
     	try (PreparedStatement pst = getConnection().prepareStatement(
-                "SELECT player1, player2, add_friend FROM " + Config.databaseName + ".friend_action WHERE player1 = ? ORDER BY timestamp DESC;")) {
+                "SELECT max(action_id), player2, add_friend FROM " + Config.databaseName + ".friend_action WHERE player1 = ?, add_friend = true GROUP BY player2;")) {
             pst.setString(1, id.toString());
             ResultSet rs = pst.executeQuery();
             
             List<UUID> friendsUUID = new ArrayList<UUID>();
             while(rs.next()){
             	UUID friendID = UUID.fromString(rs.getString("player2"));
-            	
-            	if(rs.getBoolean("add_friend")){
-            		if(!friendsUUID.contains(friendID)){
-            			friendsUUID.add(friendID);
-            		}
-            	}else{
-            		if(friendsUUID.contains(friendID)){
-            			friendsUUID.remove(friendID);
-            		}
+            	if(!friendsUUID.contains(friendID)){
+            		friendsUUID.add(friendID);
             	}
             }
             

@@ -27,6 +27,7 @@ import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.hologram.HologramManager;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
+import com.hangout.core.utils.mc.FurnaceManager;
 
 public class PlayerListener implements Listener {
 	
@@ -117,5 +118,6 @@ public class PlayerListener implements Listener {
 		//Clear player
 		CommonPlayerManager.removePlayer(e.getUUID());			
 		HangoutPlayerManager.removePlayer(e.getPlayer());
+		FurnaceManager.removePlayerLocks(e.getUUID());
 	}
 }

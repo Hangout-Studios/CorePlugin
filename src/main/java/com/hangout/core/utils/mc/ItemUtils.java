@@ -1,6 +1,7 @@
 package com.hangout.core.utils.mc;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,25 +14,25 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 public class ItemUtils {
 	
-	private static List<Material> crops = Arrays.asList(Material.BROWN_MUSHROOM, Material.CACTUS, Material.CARROT, Material.CARROT_ITEM,
+	private static HashSet<Material> crops = new HashSet<Material>(Arrays.asList(Material.BROWN_MUSHROOM, Material.CACTUS, Material.CARROT, Material.CARROT_ITEM,
 			Material.COCOA, Material.MELON, Material.MELON_BLOCK, Material.MELON_SEEDS, Material.POTATO, Material.POTATO_ITEM, Material.PUMPKIN,
 			Material.PUMPKIN_SEEDS, Material.RED_MUSHROOM, Material.SAPLING, Material.SEEDS, Material.SPECKLED_MELON, Material.SUGAR_CANE,
-			Material.SUGAR_CANE_BLOCK, Material.WHEAT);
+			Material.SUGAR_CANE_BLOCK, Material.WHEAT));
 	
-	private static List<Material> ores = Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.LAPIS_ORE, Material.GOLD_ORE,
-			Material.REDSTONE_ORE, Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.QUARTZ_ORE);
+	private static HashSet<Material> ores = new HashSet<Material>(Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.LAPIS_ORE, Material.GOLD_ORE,
+			Material.REDSTONE_ORE, Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.QUARTZ_ORE));
 	
-	private static List<Material> pickaxes = Arrays.asList(Material.WOOD_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE,
-			Material.GOLD_PICKAXE, Material.DIAMOND_PICKAXE);
+	private static HashSet<Material> pickaxes = new HashSet<Material>(Arrays.asList(Material.WOOD_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE,
+			Material.GOLD_PICKAXE, Material.DIAMOND_PICKAXE));
 	
-	private static List<Material> axes = Arrays.asList(Material.WOOD_AXE, Material.STONE_AXE, Material.IRON_AXE,
-			Material.GOLD_AXE, Material.DIAMOND_AXE);
+	private static HashSet<Material> axes = new HashSet<Material>(Arrays.asList(Material.WOOD_AXE, Material.STONE_AXE, Material.IRON_AXE,
+			Material.GOLD_AXE, Material.DIAMOND_AXE));
 	
-	private static List<Material> hoes = Arrays.asList(Material.WOOD_HOE, Material.STONE_HOE, Material.IRON_HOE,
-			Material.GOLD_HOE, Material.DIAMOND_HOE);
+	private static HashSet<Material> hoes = new HashSet<Material>(Arrays.asList(Material.WOOD_HOE, Material.STONE_HOE, Material.IRON_HOE,
+			Material.GOLD_HOE, Material.DIAMOND_HOE));
 	
-	private static List<Material> spades = Arrays.asList(Material.WOOD_SPADE, Material.STONE_SPADE, Material.IRON_SPADE,
-			Material.GOLD_SPADE, Material.DIAMOND_SPADE);
+	private static HashSet<Material> spades = new HashSet<Material>(Arrays.asList(Material.WOOD_SPADE, Material.STONE_SPADE, Material.IRON_SPADE,
+			Material.GOLD_SPADE, Material.DIAMOND_SPADE));
 	
 	public static ItemStack createItem(Material mat, String name, List<String> description){
 		ItemStack item = new ItemStack(mat);
@@ -61,6 +62,23 @@ public class ItemUtils {
 		if(ores.contains(mat)) return true;
 		return false;
 	}
+	
+	public static boolean isBuildingMaterial(Material mat){
+		return true;
+	}
+	
+	public static boolean isBuildingBlock(Material mat){
+		return true;
+	}
+	
+	public static boolean isFood(Material mat){
+		return true;
+	}
+	
+	public static boolean isRedstoneComponent(Material mat){
+		return true;
+	}
+	
 	
 	public static boolean isPickaxe(Material mat){
 		if(pickaxes.contains(mat)) return true;

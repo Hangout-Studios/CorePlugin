@@ -18,6 +18,7 @@ import com.hangout.core.item.CustomItem;
 import com.hangout.core.item.CustomItemManager;
 import com.hangout.core.listeners.BattleListener;
 import com.hangout.core.listeners.ChatListener;
+import com.hangout.core.listeners.FurnaceListener;
 import com.hangout.core.listeners.InventoryListener;
 import com.hangout.core.listeners.ItemListener;
 import com.hangout.core.listeners.MenuListener;
@@ -48,6 +49,7 @@ public class Plugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new ItemListener(), this);
 		this.getServer().getPluginManager().registerEvents(new BattleListener(), this);
 		this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+		this.getServer().getPluginManager().registerEvents(new FurnaceListener(), this);
 		
 		this.getCommand("text").setExecutor(new TextCommand());
 		this.getCommand("admin").setExecutor(new AdminCommand());

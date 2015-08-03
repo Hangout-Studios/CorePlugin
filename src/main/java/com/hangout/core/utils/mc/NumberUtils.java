@@ -20,4 +20,7 @@ public class NumberUtils {
 		return false;
 	}
 	
+	public static int multiplyByPercentage(int number, int percentage){
+		return (int)(number * ((float)percentage / 100));
+	}
 }
