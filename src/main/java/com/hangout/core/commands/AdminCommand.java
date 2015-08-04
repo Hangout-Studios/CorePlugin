@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.hangout.core.Plugin;
@@ -14,6 +15,7 @@ import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.player.PlayerRank;
 import com.hangout.core.player.ViolationReport;
+import com.hangout.core.utils.mc.CitizensManager;
 
 public class AdminCommand implements CommandExecutor {
 
@@ -177,6 +179,12 @@ public class AdminCommand implements CommandExecutor {
 			});
 			
 			return true;
+		}
+		
+		//admin npc create name
+		if(args.length == 3 && args[0].equals("npc")){
+			String name = args[2];
+			CitizensManager.createNPC(EntityType.PLAYER, name, p.getPlayer().getLocation());
 		}
 		
 		return false;

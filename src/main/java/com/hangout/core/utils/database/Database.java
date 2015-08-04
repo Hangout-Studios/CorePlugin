@@ -140,7 +140,7 @@ public class Database {
     	
     	//Load friends
     	try (PreparedStatement pst = getConnection().prepareStatement(
-                "SELECT max(action_id), player2, add_friend FROM " + Config.databaseName + ".friend_action WHERE player1 = ?, add_friend = true GROUP BY player2;")) {
+                "SELECT max(action_id), player2, add_friend FROM " + Config.databaseName + ".friend_action WHERE player1 = ? AND add_friend = true GROUP BY player2;")) {
             pst.setString(1, id.toString());
             ResultSet rs = pst.executeQuery();
             

@@ -13,8 +13,8 @@ public class NumberUtils {
 	
 	public static boolean rollPercentage(int percentage){
 		int number = randomGen.nextInt(100);
-		DebugUtils.sendDebugMessage("Generated number: " + number, DebugMode.EXTENSIVE);
-		if(number > percentage){
+		DebugUtils.sendDebugMessage("Generated number: " + number + ", passed: " + (number < percentage), DebugMode.EXTENSIVE);
+		if(number < percentage){
 			return true;
 		}
 		return false;

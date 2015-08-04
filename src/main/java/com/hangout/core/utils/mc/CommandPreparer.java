@@ -30,6 +30,8 @@ public class CommandPreparer {
 			p.getPlayer().sendMessage("This is no longer valid.");
 		}
 		
+		p.removeCommandKey(tag);
+		
 		String command = "";
 		for(String s : parts){
 			command += s + " ";

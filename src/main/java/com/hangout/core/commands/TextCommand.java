@@ -24,6 +24,11 @@ public class TextCommand implements CommandExecutor {
 			Player clicked = Bukkit.getPlayer(args[1]);
 			Player interact = Bukkit.getPlayer(args[2]);
 			
+			if(!clicked.isOnline()){
+				interact.sendMessage("That player isn't online anymore.");
+				return true;
+			}
+			
 			Bukkit.getPluginManager().callEvent(
 					new ChatPlayerClickEvent(HangoutPlayerManager.getPlayer(clicked), HangoutPlayerManager.getPlayer(interact)));
 			DebugUtils.sendDebugMessage(interact.getName() + " clicked " + clicked.getName() + " in chat", DebugMode.COMPLETE);

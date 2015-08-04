@@ -30,7 +30,7 @@ public class ItemListener implements Listener {
         HangoutPlayer hp = HangoutPlayerManager.getPlayer(p.getUniqueId());
         
         //Only work with right clicks or when not cancelled
-        if(e.isCancelled() || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK)) return;
+        if((e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK)) return;
         
         //Check if the player has an item in his hand
         if (!e.hasItem())

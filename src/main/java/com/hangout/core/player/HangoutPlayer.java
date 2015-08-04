@@ -515,6 +515,12 @@ public class HangoutPlayer {
 		return -1;
 	}
 	
+	public void removeCommandKey(String tag){
+		if(commandKeys.containsKey(tag)){
+			commandKeys.remove(tag);
+		}
+	}
+	
 	public void attemptRemove(){
 		boolean clearToRemove = true;
 		for(HangoutPlayer otherP : HangoutPlayerManager.getPlayers()){
