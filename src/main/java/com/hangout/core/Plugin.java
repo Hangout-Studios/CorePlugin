@@ -16,7 +16,9 @@ import com.hangout.core.commands.ReportCommand;
 import com.hangout.core.commands.TextCommand;
 import com.hangout.core.item.CustomItem;
 import com.hangout.core.item.CustomItemManager;
+import com.hangout.core.item.CustomItemRarity;
 import com.hangout.core.listeners.BattleListener;
+import com.hangout.core.listeners.ReplaceBlockListener;
 import com.hangout.core.listeners.ChatListener;
 import com.hangout.core.listeners.FurnaceListener;
 import com.hangout.core.listeners.InventoryListener;
@@ -50,6 +52,7 @@ public class Plugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new BattleListener(), this);
 		this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
 		this.getServer().getPluginManager().registerEvents(new FurnaceListener(), this);
+		this.getServer().getPluginManager().registerEvents(new ReplaceBlockListener(), this);
 		
 		this.getCommand("text").setExecutor(new TextCommand());
 		this.getCommand("admin").setExecutor(new AdminCommand());
@@ -64,7 +67,7 @@ public class Plugin extends JavaPlugin {
 		
 		//Create some custom items
 		ItemStack menuItem = ItemUtils.createItem(Material.PAPER, "Open interface", Arrays.asList("Right click to use"));
-		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false, false));
+		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false, false, CustomItemRarity.COMMON));
 		HangoutPlayerManager.addStandardLoadoutItem(menuItem, 8);
 		
 		//Add chat channels

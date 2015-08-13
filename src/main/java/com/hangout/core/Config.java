@@ -22,6 +22,7 @@ public class Config {
         databaseName = Plugin.getInstance().getConfig().getString("SQL.Database");
         
         debugMode = DebugMode.valueOf(Plugin.getInstance().getConfig().getString("Debug_Mode", "WARNING"));
+        
         return true;
     }
 

@@ -295,7 +295,6 @@ public class ItemUtils {
 	}
 	
 	public static boolean isBuildingMaterial(Material mat){
-		System.out.print("Looking for: " + mat.toString());
 		if(buildingMaterial.contains(mat)) return true;
 		return false;
 	}

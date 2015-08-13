@@ -15,12 +15,14 @@ public class FurnaceManager {
 	public static void claimFurnace(Block b, UUID p){
 		if(!claimedFurnaces.containsKey(b)){
 			claimedFurnaces.put(b, p);
+			System.out.print("Player claimed a furnace...");
 		}
 	}
 	
 	public static void removeFurnace(Block b){
 		if(claimedFurnaces.containsKey(b)){
 			claimedFurnaces.remove(b);
+			System.out.print("Player released a furnace..");
 		}
 	}
 	

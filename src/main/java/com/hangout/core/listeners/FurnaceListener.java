@@ -42,7 +42,7 @@ public class FurnaceListener implements Listener {
 			Block b = FurnaceManager.closeFurnace(p.getUniqueId());
 			FurnaceInventory inv = (FurnaceInventory)e.getInventory();
 			
-			if(inv.getSmelting() == null){
+			if(inv.getSmelting() == null && inv.getResult() == null){
 				FurnaceManager.removeFurnace(b);
 			}
 		}

@@ -54,10 +54,10 @@ public class ItemListener implements Listener {
 		HangoutPlayer p = HangoutPlayerManager.getPlayer((Player)e.getWhoClicked());
 		ItemStack item = e.getCurrentItem();
 		
-		CustomItem ci = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
-		if(ci != null){
-			Bukkit.getPluginManager().callEvent(new CustomItemClickEvent(ci, p));
-			DebugUtils.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + ci.getName(), DebugMode.EXTENSIVE);
+		CustomItem cm = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
+		if(cm != null && cm.allowItemClick()){
+			Bukkit.getPluginManager().callEvent(new CustomItemClickEvent(cm, p));
+			DebugUtils.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + cm.getName(), DebugMode.EXTENSIVE);
 		}
 		
 		if(p.isInMenu()){
