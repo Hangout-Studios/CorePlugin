@@ -88,6 +88,10 @@ public class HologramManager {
 		return new ArrayList<Hologram>(globalHolograms.values());
 	}
 	
+	public static HashMap<String, Hologram> getHologramMap(){
+		return globalHolograms;
+	}
+	
 	public static List<Hologram> getHolograms(UUID id){
 		if(!personalHolograms.containsKey(id)){
 			return new ArrayList<Hologram>();

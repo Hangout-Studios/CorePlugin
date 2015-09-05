@@ -181,10 +181,11 @@ public class AdminCommand implements CommandExecutor {
 			return true;
 		}
 		
-		//admin npc create name
-		if(args.length == 3 && args[0].equals("npc")){
+		//admin npc create name type
+		if(args.length == 4 && args[0].equals("npc")){
 			String name = args[2];
-			CitizensManager.createNPC(EntityType.PLAYER, name, p.getPlayer().getLocation());
+			String type = args[3];
+			CitizensManager.createNPC(EntityType.PLAYER, name, p.getPlayer().getLocation(), type);
 		}
 		
 		return false;

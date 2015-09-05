@@ -66,6 +66,8 @@ public class PlayerListener implements Listener {
 	public void onPlayerJoinComplete(PlayerJoinCompleteEvent e){
 		//e.getPlayer().reset();
 		
+		e.getPlayer().updateSidebar();
+		
 		for(Player p : Bukkit.getOnlinePlayers()){
 			HangoutPlayer otherP = HangoutPlayerManager.getPlayer(p);
 			

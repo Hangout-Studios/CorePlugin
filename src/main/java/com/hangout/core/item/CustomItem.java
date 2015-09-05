@@ -10,17 +10,21 @@ public class CustomItem {
 	
 	private ItemStack item;
 	private String tag;
-	private boolean allowItemClick = false;
-	private boolean allowRightClick = true;
+	private boolean fireItemClickEvent = false;
+	private boolean fireRightClickEvent = true;
+	private boolean fireSwitchEvent = false;
 	private boolean dropable = true;
 	private boolean dropOnDeath = true;
 	private CustomItemRarity rarity;
 	
-	public CustomItem(ItemStack item, String tag, boolean allowItemClick, boolean allowRightClick, boolean dropable, boolean dropOnDeath, CustomItemRarity rarity){
+	public CustomItem(ItemStack item, String tag, 
+			boolean fireItemClickEvent, boolean fireRightClickEvent, boolean fireSwitchEvent, 
+			boolean dropable, boolean dropOnDeath, CustomItemRarity rarity){
 		this.item = item;
 		this.tag = tag;
-		this.allowItemClick = allowItemClick;
-		this.allowRightClick = allowRightClick;
+		this.fireItemClickEvent = fireItemClickEvent;
+		this.fireRightClickEvent = fireRightClickEvent;
+		this.fireSwitchEvent = fireSwitchEvent;
 		this.dropable = dropable;
 		this.dropOnDeath = dropOnDeath;
 		this.rarity = rarity;
@@ -50,12 +54,16 @@ public class CustomItem {
 		return tag;
 	}
 	
-	public boolean allowRightClick(){
-		return allowRightClick;
+	public boolean fireRightClickEvent(){
+		return fireRightClickEvent;
 	}
 	
-	public boolean allowItemClick(){
-		return allowItemClick;
+	public boolean fireItemClickEvent(){
+		return fireItemClickEvent;
+	}
+	
+	public boolean fireItemSwitchEvent(){
+		return fireSwitchEvent;
 	}
 	
 	public boolean allowDrop(){

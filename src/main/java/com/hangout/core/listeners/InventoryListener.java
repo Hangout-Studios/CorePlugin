@@ -23,9 +23,7 @@ public class InventoryListener  implements Listener{
 		
 		p.setInInventory(false);
 		
-		if(menu != null){
-			//p.setOpenMenu(null);
-			
+		if(menu != null){			
 			DebugUtils.sendDebugMessage(p.getName() + " closed menu " + menu.getTitle(), DebugMode.EXTENSIVE);
 			
 			Bukkit.getPluginManager().callEvent(new MenuCloseEvent(p, menu));

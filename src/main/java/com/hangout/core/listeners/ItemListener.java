@@ -9,9 +9,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.hangout.core.events.CustomItemClickEvent;
+import com.hangout.core.events.CustomItemSwitchEvent;
 import com.hangout.core.events.CustomItemUseEvent;
 import com.hangout.core.events.MenuItemClickEvent;
 import com.hangout.core.item.CustomItem;
@@ -40,7 +42,7 @@ public class ItemListener implements Listener {
         if(!e.getItem().hasItemMeta()) return;
         
         CustomItem cm = CustomItemManager.getItem(e.getItem().getItemMeta().getDisplayName());
-        if(cm != null && cm.allowRightClick()){
+        if(cm != null && cm.fireRightClickEvent()){
         	Bukkit.getPluginManager().callEvent(new CustomItemUseEvent(cm, hp));
         	DebugUtils.sendDebugMessage(hp.getDisplayName() + " used custom item " + cm.getName(), DebugMode.DEBUG);
         }
@@ -55,7 +57,7 @@ public class ItemListener implements Listener {
 		ItemStack item = e.getCurrentItem();
 		
 		CustomItem cm = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
-		if(cm != null && cm.allowItemClick()){
+		if(cm != null && cm.fireItemClickEvent()){
 			Bukkit.getPluginManager().callEvent(new CustomItemClickEvent(cm, p));
 			DebugUtils.sendDebugMessage(p.getName() + " has clicked custom item in inventory " + cm.getName(), DebugMode.EXTENSIVE);
 		}
@@ -69,6 +71,23 @@ public class ItemListener implements Listener {
 					return;
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerItemHeld(PlayerItemHeldEvent e){
+		ItemStack item = e.getPlayer().getInventory().getItem(e.getNewSlot());
+		if (item == null || item.getType() == Material.AIR)
+            return;
+		
+		HangoutPlayer p = HangoutPlayerManager.getPlayer(e.getPlayer());
+		
+		CustomItem cm = CustomItemManager.getItem(item.getItemMeta().getDisplayName());
+		if(cm != null && cm.fireItemSwitchEvent()){
+			CustomItemSwitchEvent event = new CustomItemSwitchEvent(cm, p);
+			Bukkit.getPluginManager().callEvent(event);
+			
+			DebugUtils.sendDebugMessage(p.getName() + " has switched to custom item in inventory " + cm.getName(), DebugMode.EXTENSIVE);
 		}
 	}
 	

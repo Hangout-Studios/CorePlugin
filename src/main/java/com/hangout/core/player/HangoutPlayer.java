@@ -23,6 +23,8 @@ import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.CommandPreparer;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
+import com.hangout.core.utils.scoreboard.Displayboard;
+import com.hangout.core.utils.scoreboard.DisplayboardManager;
 
 public class HangoutPlayer {
 	
@@ -472,6 +474,7 @@ public class HangoutPlayer {
 		DebugUtils.sendDebugMessage(getName() + " got " + gold + " from " + source, DebugMode.DEBUG);
 		if(commitToDatabase){
 			Database.executeGoldAction(getUUID(), gold, source);
+			updateSidebar();
 		}
 	}
 	
@@ -519,6 +522,14 @@ public class HangoutPlayer {
 		if(commandKeys.containsKey(tag)){
 			commandKeys.remove(tag);
 		}
+	}
+	
+	public void updateSidebar(){
+		Displayboard board = DisplayboardManager.getScoreboard(getUUID());
+		
+		board.setSidebarLine(0, ""+ ChatColor.GOLD + ChatColor.BOLD + "Gold:");
+		board.setSidebarLine(1, ""+ ChatColor.ITALIC + getCurrency());
+		board.setSidebarLine(2, " ");
 	}
 	
 	public void attemptRemove(){
