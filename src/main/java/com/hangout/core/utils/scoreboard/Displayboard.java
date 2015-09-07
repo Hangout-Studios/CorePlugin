@@ -52,7 +52,7 @@ public class Displayboard {
 		sidebar.setDisplayName(""+ ChatColor.AQUA + ChatColor.BOLD + "The Hangout");
 	}
 	
-	public void setPrefix(String name, String prefix){
+	public void setNameTags(String name, String prefix, String suffix){
 		Team t = sb.getTeam(name);
 		
 		
@@ -66,6 +66,7 @@ public class Displayboard {
 				t = sb.registerNewTeam(name);
 			}
 			t.setPrefix(ChatColor.RED + "[" + prefix + "]" + ChatColor.RESET);
+			t.setSuffix(""+ChatColor.RESET + ChatColor.RED + "[" + suffix + "]");
 		}
 		
 		if(!t.hasEntry(name)){

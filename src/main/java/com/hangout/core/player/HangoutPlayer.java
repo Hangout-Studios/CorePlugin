@@ -19,6 +19,7 @@ import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.chat.ChatManager;
 import com.hangout.core.events.PlayerDataReleaseEvent;
 import com.hangout.core.menu.MenuInventory;
+import com.hangout.core.reports.ViolationReport;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.CommandPreparer;
 import com.hangout.core.utils.mc.DebugUtils;
@@ -459,8 +460,10 @@ public class HangoutPlayer {
 		
 		if(b){
 			getPlayer().sendMessage("You have enabled PvP!");
+			DisplayboardManager.setSuffix(getPlayer(), "PvP");
 		}else{
 			getPlayer().sendMessage("You have disabled PvP!");
+			DisplayboardManager.setSuffix(getPlayer(), null);
 		}
 	}
 	

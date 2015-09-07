@@ -23,7 +23,10 @@ import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayer.PlayerState;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.player.PlayerRank;
-import com.hangout.core.player.ViolationReport;
+import com.hangout.core.reports.BugReport;
+import com.hangout.core.reports.PlayerReport;
+import com.hangout.core.reports.ReportDatabase;
+import com.hangout.core.reports.ViolationReport;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 import com.mysql.jdbc.StringUtils;
@@ -64,6 +67,49 @@ public class Database {
     
     public static void addCustomPlayerProperty(String databaseColumn, PropertyTypes type){
     	customProperties.put(databaseColumn, type);
+    }
+    
+    public static void loadReports(){
+    	
+    	//Load bug reports
+    	try (PreparedStatement pst = getConnection().prepareStatement(
+                "SELECT report_id, timestamp, report, accepted_by, player_id, v_player.name as name " +
+                "FROM " + Config.databaseName + ".bug_report as t_report " +
+                "JOIN(" +
+                	"SELECT t_players.uuid, t_players.name " +
+                	"FROM " + Config.databaseName + ".players as t_players " +
+    			") v_player ON(t_report.player_id = v_player.uuid) " +
+    			"WHERE accepted_by = '-';")) {
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+            	ReportDatabase.addBugReport(new BugReport(rs.getString("name"), rs.getString("report"),
+            			new DateTime(rs.getTimestamp("timestamp")), rs.getInt("report_id")));
+            }
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+    	//Load player reports
+    	try (PreparedStatement pst = getConnection().prepareStatement(
+                "SELECT report_id, timestamp, report, accepted_by, player_id, reported_id, v_player1.name as name1, v_player2.name as name2 " +
+                "FROM " + Config.databaseName + ".player_report as t_report " +
+                "JOIN(" +
+                	"SELECT t_players.uuid, t_players.name " +
+                	"FROM " + Config.databaseName + ".players as t_players " +
+    			") v_player1 ON(t_report.player_id = v_player1.uuid) " +
+                "JOIN(" +
+            		"SELECT t_players.uuid, t_players.name " +
+            		"FROM " + Config.databaseName + ".players as t_players " +
+            	") v_player2 ON(t_report.reported_id = v_player2.uuid) " +
+    			"WHERE accepted_by = '-';")) {
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+            	ReportDatabase.addPlayerReport(new PlayerReport(rs.getString("name1"), rs.getString("name2"), rs.getString("report"),
+            			new DateTime(rs.getTimestamp("timestamp")), rs.getInt("report_id")));
+            }
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
     
     public static HangoutPlayer loadPlayer(UUID id, String playerName){
@@ -365,6 +411,8 @@ public class Database {
     	secondary.put("report", report);
     	
     	saveToDatabase("bug_report", primary, secondary);
+    	
+    	ReportDatabase.addBugReport(new BugReport(Bukkit.getPlayer(playerID).getName(), report, DateTime.now(), -1));
 	}
 	
 	public static void executePlayerReport(UUID playerID, UUID reportedID, String report){
@@ -376,6 +424,19 @@ public class Database {
     	secondary.put("report", report);
     	
     	saveToDatabase("player_report", primary, secondary);
+    	
+    	ReportDatabase.addPlayerReport(new PlayerReport(Bukkit.getPlayer(playerID).getName(), Bukkit.getPlayer(reportedID).getName(),
+    			report, DateTime.now(), -1));
+	}
+	
+	public static void finishReport(int reportID, UUID by, String reportType){
+		HashMap<String, Object> primary = new HashMap<String, Object>();
+    	HashMap<String, Object> secondary = new HashMap<String, Object>();
+    	
+    	primary.put("report_id", reportID);
+    	secondary.put("accepted_by", by.toString());
+    	
+    	saveToDatabase(reportType + "_report", primary, secondary);
 	}
 	
 	public static void executeMuteAction(UUID playerID, UUID mutedID, String action){

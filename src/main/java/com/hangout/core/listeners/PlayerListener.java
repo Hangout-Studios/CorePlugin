@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,8 +22,10 @@ import com.hangout.core.events.PlayerPreSaveEvent;
 import com.hangout.core.events.PlayerQuitCompleteEvent;
 import com.hangout.core.player.CommonPlayerManager;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.player.PlayerRank;
 import com.hangout.core.player.HangoutPlayer.PlayerState;
 import com.hangout.core.player.HangoutPlayerManager;
+import com.hangout.core.reports.ReportDatabase;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.hologram.HologramManager;
 import com.hangout.core.utils.mc.DebugUtils;
@@ -66,14 +69,35 @@ public class PlayerListener implements Listener {
 	public void onPlayerJoinComplete(PlayerJoinCompleteEvent e){
 		//e.getPlayer().reset();
 		
-		e.getPlayer().updateSidebar();
+		HangoutPlayer hp = e.getPlayer();
+		Player p = hp.getPlayer();
 		
-		for(Player p : Bukkit.getOnlinePlayers()){
-			HangoutPlayer otherP = HangoutPlayerManager.getPlayer(p);
+		hp.updateSidebar();
+		
+		for(Player otherP : Bukkit.getOnlinePlayers()){
+			HangoutPlayer otherHP = HangoutPlayerManager.getPlayer(otherP);
 			
-			e.getPlayer().getClickableName(otherP, false, false)
+			hp.getClickableName(otherHP, false, false)
 				.then(" has entered the realm.")
 			.send(otherP.getPlayer());
+		}
+		
+		if(hp.getHighestRank().isRankOrHigher(PlayerRank.MODERATOR)){
+			int bugs = ReportDatabase.getBugReports().size();
+			int players = ReportDatabase.getPlayerReports().size();
+			if(bugs == 0 && players == 0) return;
+			
+			String reportAlert = "" + ChatColor.RED + ChatColor.BOLD + "There are ";
+			if(bugs != 0){
+				reportAlert += bugs + " bug(s) reported ";
+				if(players != 0){
+					reportAlert += "and " + players + " player(s) reported.";
+				}
+			}else{
+				reportAlert += players + " players reported.";
+			}
+			
+			p.sendMessage(reportAlert);
 		}
 	}
 	

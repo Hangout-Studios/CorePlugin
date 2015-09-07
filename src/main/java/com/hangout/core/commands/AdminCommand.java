@@ -14,7 +14,7 @@ import com.hangout.core.Plugin;
 import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.player.PlayerRank;
-import com.hangout.core.player.ViolationReport;
+import com.hangout.core.reports.ViolationReport;
 import com.hangout.core.utils.mc.CitizensManager;
 
 public class AdminCommand implements CommandExecutor {

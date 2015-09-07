@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.hologram.HologramManager;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
@@ -45,6 +46,8 @@ public class Config {
         	HologramManager.createHologram(s2[0], Arrays.asList(s2[1]), 
         			new Location(Bukkit.getWorld(s3[0]), Integer.parseInt(s3[1]), Integer.parseInt(s3[2]), Integer.parseInt(s3[3])));
         }
+        
+        Database.loadReports();
         
         return true;
     }

@@ -3,12 +3,13 @@ package com.hangout.core.utils.scoreboard;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class DisplayboardManager {
 	
 	private static HashMap<UUID, Displayboard> scoreboards = new HashMap<UUID, Displayboard>();
-	private static HashMap<String, String> prefixes = new HashMap<String, String>();
+	private static HashMap<UUID, DisplayBoardTags> nameTags = new HashMap<UUID, DisplayBoardTags>();
 	
 	public static Displayboard getScoreboard(UUID id){
 		if(scoreboards.containsKey(id)){
@@ -21,6 +22,7 @@ public class DisplayboardManager {
 	private static Displayboard createScoreboard(UUID id){
 		Displayboard sb = new Displayboard(id);
 		scoreboards.put(id, sb);
+		nameTags.put(id, new DisplayBoardTags(Bukkit.getPlayer(id).getName(), null, null));
 		return sb;
 	}
 	
@@ -32,26 +34,27 @@ public class DisplayboardManager {
 		}
 	}
 	
-	public static void setPrefix(Player p, String prefix){
-		String name = p.getName();
-		if(prefix == null){
-			if(prefixes.containsKey(name)){
-				prefixes.remove(name);
-			}
-		}else{
-			prefixes.put(name, prefix);
-		}
-		
-		System.out.print("Setting prefix: " + name + ", " + prefix);
+	public static void setPrefix(Player p, String s){
+		DisplayBoardTags tags = nameTags.get(p.getUniqueId());
+		tags.setPrefix(s);
 		
 		for(Displayboard b : scoreboards.values()){
-			b.setPrefix(name, prefix);
+			tags.applyTo(b);
 		}
 	}
 	
-	public static void setPrefix(Displayboard b){
-		for(String name : prefixes.keySet()){
-			b.setPrefix(name, prefixes.get(name));
+	public static void setSuffix(Player p, String s){
+		DisplayBoardTags tags = nameTags.get(p.getUniqueId());
+		tags.setSuffix(s);
+		
+		for(Displayboard b : scoreboards.values()){
+			tags.applyTo(b);
+		}
+	}
+	
+	public static void setTags(Displayboard b){
+		for(DisplayBoardTags tags : nameTags.values()){
+			tags.applyTo(b);
 		}
 	}
 }

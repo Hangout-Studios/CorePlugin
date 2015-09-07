@@ -1,4 +1,4 @@
-package com.hangout.core.player;
+package com.hangout.core.reports;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

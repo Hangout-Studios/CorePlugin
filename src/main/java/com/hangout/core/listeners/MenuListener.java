@@ -1,5 +1,7 @@
 package com.hangout.core.listeners;
 
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,6 +16,9 @@ import com.hangout.core.events.MenuCloseEvent;
 import com.hangout.core.events.MenuItemClickEvent;
 import com.hangout.core.menu.MenuUtils;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.reports.BugReport;
+import com.hangout.core.reports.PlayerReport;
+import com.hangout.core.reports.ReportDatabase;
 import com.hangout.core.utils.database.Database;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
@@ -86,6 +91,46 @@ public class MenuListener implements Listener {
 			p.setPvpEnabled(false);
 			Database.executePvpFlagAction(p.getUUID(), false);
 			MenuUtils.createSettingsMenu(p).openMenu(p, false);
+			return;
+		}
+		
+		//Admin button
+		if(e.getItem().getTag().equals("admin_tools")){
+			MenuUtils.createAdminMenu(p).openMenu(p, true);
+			return;
+		}
+		
+		if(e.getItem().getTag().equals("bug_reports")){
+			MenuUtils.createBugReportsMenu(p).openMenu(p, true);
+			return;
+		}
+		
+		if(e.getItem().getTag().equals("player_reports")){
+			MenuUtils.createPlayerReportsMenu(p).openMenu(p, true);
+			return;
+		}
+		
+		if(e.getItem().getTag().startsWith("player_report_")){
+			String[] split = e.getItem().getTag().split("_");
+			int id = Integer.parseInt(split[2]);
+			PlayerReport r = ReportDatabase.removePlayerReport(id);
+			Database.finishReport(r.getID(), p.getUUID(), "player");
+			
+			p.getPlayer().sendMessage(""+ ChatColor.RED + ChatColor.BOLD + "You have checked off report #" + id);
+			
+			MenuUtils.createPlayerReportsMenu(p).openMenu(p, false);
+			return;
+		}
+		
+		if(e.getItem().getTag().startsWith("bug_report_")){
+			String[] split = e.getItem().getTag().split("_");
+			int id = Integer.parseInt(split[2]);
+			BugReport r = ReportDatabase.removeBugReport(id);
+			Database.finishReport(r.getID(), p.getUUID(), "bug");
+			
+			p.getPlayer().sendMessage(""+ ChatColor.RED + ChatColor.BOLD + "You have checked off bug #" + id);
+			
+			MenuUtils.createBugReportsMenu(p).openMenu(p, false);
 			return;
 		}
 	}

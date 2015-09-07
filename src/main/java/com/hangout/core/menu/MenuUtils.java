@@ -3,8 +3,6 @@ package com.hangout.core.menu;
 import java.util.Arrays;
 import java.util.List;
 
-import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +11,10 @@ import com.hangout.core.chat.ChatChannel;
 import com.hangout.core.chat.ChatManager;
 import com.hangout.core.events.MenuCreateEvent;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.player.PlayerRank;
+import com.hangout.core.reports.BugReport;
+import com.hangout.core.reports.PlayerReport;
+import com.hangout.core.reports.ReportDatabase;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
@@ -26,7 +28,7 @@ public class MenuUtils {
 	}
 	
 	public static MenuItem createMenuItem(MenuInventory menu, Material mat, String itemName, List<String> description, int menuPosition, String itemTag){
-		MenuItem menuItem = new MenuItem(mat, ChatColor.WHITE + itemName, description, itemTag);
+		MenuItem menuItem = new MenuItem(mat, itemName, description, itemTag);
 		menu.addMenuItem(menuItem, menuPosition);
 		
 		DebugUtils.sendDebugMessage("Put item " + itemTag + " at " + menuPosition, DebugMode.EXTENSIVE);
@@ -43,6 +45,11 @@ public class MenuUtils {
 	
 	public static MenuInventory createMainMenu(HangoutPlayer p){
 		MenuInventory inventory = createMenu("Main menu", "main_menu", p);
+		
+		if(p.getHighestRank().isRankOrHigher(PlayerRank.MODERATOR)){
+			createMenuItem(inventory, Material.BEACON, "Admin tools", Arrays.asList("Check out player reports,", "bug reports and other", "admin related stuff."), 5 + 8, "admin_tools");
+		}
+		
 		createMenuItem(inventory, Material.SKULL_ITEM, "Friend list", Arrays.asList("Check out your friends!"), 6 + 8, "friend_list");
 		createMenuItem(inventory, Material.BED, "Settings", Arrays.asList("Find various settings here!"), 8 + 8, "settings");
 		return inventory;
@@ -87,6 +94,43 @@ public class MenuUtils {
 		}else{
 			createMenuItem(inventory, Material.CAKE, "Enable PvP", Arrays.asList("Enable PvP with other players.", "Warning: disabling PvP takes", "5 minutes without combat!"), 7 + 9, "pvp_enable");
 		}
+		return inventory;
+	}
+	
+	public static MenuInventory createAdminMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("Admin menu", "admin_menu", p);
+		
+		createMenuItem(inventory, Material.BEACON, "Bug reports", Arrays.asList("Reported bugs go here."), 4 + 8, "bug_reports");
+		createMenuItem(inventory, Material.BEACON, "Player reports", Arrays.asList("Apparently someone's", "been naughty..."), 6 + 8, "player_reports");
+		
+		return inventory;
+	}
+	
+	public static MenuInventory createBugReportsMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("Bug reports", "bug_reports_menu", p);
+		
+		int count = 0;
+		for(BugReport r : ReportDatabase.getBugReports()){
+			ItemStack i = r.getItem();
+			createMenuItem(inventory, Material.ANVIL, i.getItemMeta().getDisplayName(), 
+					i.getItemMeta().getLore(), count, "bug_report_" + r.getID());
+			count++;
+		}
+		
+		return inventory;
+	}
+	
+	public static MenuInventory createPlayerReportsMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("Player reports", "player_reports_menu", p);
+		
+		int count = 0;
+		for(PlayerReport r : ReportDatabase.getPlayerReports()){
+			ItemStack i = r.getItem();
+			createMenuItem(inventory, Material.APPLE, i.getItemMeta().getDisplayName(), 
+					i.getItemMeta().getLore(), count, "player_report_" + r.getID());
+			count++;
+		}
+		
 		return inventory;
 	}
 }

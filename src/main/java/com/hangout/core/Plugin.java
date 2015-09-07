@@ -67,7 +67,7 @@ public class Plugin extends JavaPlugin {
 		
 		//Create some custom items
 		ItemStack menuItem = ItemUtils.createItem(Material.PAPER, "Open interface", Arrays.asList("Right click to use"));
-		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false, false, false, CustomItemRarity.COMMON));
+		CustomItemManager.addItem(new CustomItem(menuItem, "main_menu", true, true, false, false, false, CustomItemRarity.COMMON, false));
 		HangoutPlayerManager.addStandardLoadoutItem(menuItem, 8);
 		
 		//Add chat channels

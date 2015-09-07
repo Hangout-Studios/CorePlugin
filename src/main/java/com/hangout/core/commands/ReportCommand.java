@@ -49,7 +49,7 @@ public class ReportCommand implements CommandExecutor {
 			p.getPlayer().sendMessage("Thank you for reporting! We will check it out as soon as we can!");
 			
 			HangoutPlayerManager.alertModerators(PlayerRank.ADMIN,
-					""+ChatColor.RED + ChatColor.BOLD + " ALERT: " + 
+					""+ChatColor.RED + ChatColor.BOLD + "ALERT: " + 
 					ChatColor.WHITE + p.getName() + " has reported a bug: " + ChatColor.ITALIC + explaination);
 			
 			return true;
