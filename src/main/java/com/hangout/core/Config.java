@@ -68,6 +68,8 @@ public class Config {
     	
     	file.set("Holograms", list);
     	
+    	list.clear();
+    	
     	try {
 			file.save(Plugin.getInstance().getDataFolder() + File.separator + "config.yml");
 		} catch (IOException e) {

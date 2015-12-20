@@ -3,6 +3,7 @@ package com.hangout.core.item;
 import org.bukkit.ChatColor;
 
 public enum CustomItemRarity {
+	JUNK(ChatColor.GRAY, "Junk"),
 	COMMON(ChatColor.WHITE, "Common"),
 	UNCOMMON(ChatColor.GREEN, "Uncommon"),
 	RARE(ChatColor.BLUE, "Rare"),

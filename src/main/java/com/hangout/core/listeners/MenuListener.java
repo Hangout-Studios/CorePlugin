@@ -16,10 +16,12 @@ import com.hangout.core.events.MenuCloseEvent;
 import com.hangout.core.events.MenuItemClickEvent;
 import com.hangout.core.menu.MenuUtils;
 import com.hangout.core.player.HangoutPlayer;
+import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.reports.BugReport;
 import com.hangout.core.reports.PlayerReport;
 import com.hangout.core.reports.ReportDatabase;
 import com.hangout.core.utils.database.Database;
+import com.hangout.core.utils.mc.CommandPreparer;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
 
@@ -132,6 +134,27 @@ public class MenuListener implements Listener {
 			
 			MenuUtils.createBugReportsMenu(p).openMenu(p, false);
 			return;
+		}
+		
+		if(e.getItem().getTag().equals("report_bug")){
+			e.getPlayer().getPlayer().closeInventory();
+			
+			CommandPreparer c = e.getPlayer().createCommandPreparer("report_bug", true);
+			c.append("report bug");
+			
+			e.getPlayer().getPlayer().sendMessage(ChatColor.ITALIC + "Please write your explaination of the bug in chat.");
+		}
+		
+		if(e.getItem().getTag().equals("npc_options")){
+			MenuUtils.createNpcOptionsMenu(p).openMenu(p, true);
+		}
+		
+		if(e.getItem().getTag().equals("npc_create")){
+			MenuUtils.createNpcCreateMenu(p).openMenu(p, true);
+		}
+		
+		if(e.getItem().getTag().equals("npc_edit")){
+			MenuUtils.createNpcEditMenu(p).openMenu(p, true);
 		}
 	}
 	

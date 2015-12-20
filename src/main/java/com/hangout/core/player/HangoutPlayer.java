@@ -52,6 +52,7 @@ public class HangoutPlayer {
 	private int gold = 0;
 	private HashMap<String, CommandPreparer> commands = new HashMap<String, CommandPreparer>();
 	private HashMap<String, Integer> commandKeys = new HashMap<String, Integer>();
+	private CommandPreparer listeningCommand = null;
 	
 	private Stack<MenuInventory> openMenu = new Stack<MenuInventory>();
 	private boolean isInInventory = false;
@@ -485,9 +486,16 @@ public class HangoutPlayer {
 		return gold;
 	}
 	
-	public CommandPreparer createCommandPreparer(String tag){
+	public CommandPreparer createCommandPreparer(String tag, boolean asListener){
 		CommandPreparer command = new CommandPreparer(this, tag, generateNewCommandKey(tag));
 		commands.put(tag, command);
+		
+		if(asListener){
+			if(listeningCommand != null){
+				clearCommandPreparer(listeningCommand.getTag());
+			}
+			listeningCommand = command;
+		}
 		return command;
 	}
 	
@@ -506,6 +514,14 @@ public class HangoutPlayer {
 		if(commandKeys.containsKey(tag)){
 			commandKeys.remove(tag);
 		}
+		
+		if(listeningCommand.getTag().equals(tag)){
+			listeningCommand = null;
+		}
+	}
+	
+	public CommandPreparer getListeningCommand(){
+		return listeningCommand;
 	}
 	
 	public int generateNewCommandKey(String tag){

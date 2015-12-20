@@ -40,8 +40,6 @@ public class Displayboard {
 		
 		sidebar.getScore(s).setScore(line);
 		entries.put(line, s);
-		
-		System.out.print("Set line: " + s + " on " + line);
 	}
 	
 	public void registerObjectives(){

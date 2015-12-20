@@ -29,4 +29,13 @@ public enum PlayerRank {
 		}
 		return false;
 	}
+	
+	public PlayerRank getRank(int i){
+		for(PlayerRank r : PlayerRank.values()){
+			if(r.priorityValue == i){
+				return r;
+			}
+		}
+		return null;
+	}
 }

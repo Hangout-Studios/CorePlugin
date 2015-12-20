@@ -15,7 +15,7 @@ import com.hangout.core.player.HangoutPlayer;
 import com.hangout.core.player.HangoutPlayerManager;
 import com.hangout.core.player.PlayerRank;
 import com.hangout.core.reports.ViolationReport;
-import com.hangout.core.utils.mc.CitizensManager;
+import com.hangout.core.utils.npc.NPCManager;
 
 public class AdminCommand implements CommandExecutor {
 
@@ -180,14 +180,6 @@ public class AdminCommand implements CommandExecutor {
 			
 			return true;
 		}
-		
-		//admin npc create name type
-		if(args.length == 4 && args[0].equals("npc")){
-			String name = args[2];
-			String type = args[3];
-			CitizensManager.createNPC(EntityType.PLAYER, name, p.getPlayer().getLocation(), type);
-		}
-		
 		return false;
 	}
 }

@@ -60,7 +60,6 @@ public class CustomItemManager {
 	}
 	
 	public static CustomItem getDefaultItem(Material mat){
-		System.out.print("Looking for default item: " + mat.toString());
 		if(defaultItems.containsKey(mat)){
 			return defaultItems.get(mat);
 		}

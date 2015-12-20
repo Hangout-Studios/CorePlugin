@@ -17,6 +17,8 @@ import com.hangout.core.reports.PlayerReport;
 import com.hangout.core.reports.ReportDatabase;
 import com.hangout.core.utils.mc.DebugUtils;
 import com.hangout.core.utils.mc.DebugUtils.DebugMode;
+import com.hangout.core.utils.npc.NPCManager;
+import com.hangout.core.utils.npc.NPCManager.NPCData;
 
 public class MenuUtils {
 	
@@ -52,6 +54,7 @@ public class MenuUtils {
 		
 		createMenuItem(inventory, Material.SKULL_ITEM, "Friend list", Arrays.asList("Check out your friends!"), 6 + 8, "friend_list");
 		createMenuItem(inventory, Material.BED, "Settings", Arrays.asList("Find various settings here!"), 8 + 8, "settings");
+		createMenuItem(inventory, Material.BONE, "Report bug", Arrays.asList("Found a bug?", "Click to report it!"), 5 + 8 + 9, "report_bug");
 		return inventory;
 	}
 	
@@ -100,6 +103,7 @@ public class MenuUtils {
 	public static MenuInventory createAdminMenu(HangoutPlayer p){
 		MenuInventory inventory = createMenu("Admin menu", "admin_menu", p);
 		
+		createMenuItem(inventory, Material.SKULL_ITEM, "NPCs", Arrays.asList("Manage NPCs here."), 2 + 8, "npc_options");
 		createMenuItem(inventory, Material.BEACON, "Bug reports", Arrays.asList("Reported bugs go here."), 4 + 8, "bug_reports");
 		createMenuItem(inventory, Material.BEACON, "Player reports", Arrays.asList("Apparently someone's", "been naughty..."), 6 + 8, "player_reports");
 		
@@ -133,4 +137,39 @@ public class MenuUtils {
 		
 		return inventory;
 	}
+	
+	public static MenuInventory createNpcOptionsMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("NPC Options", "npc_options_menu", p);
+		
+		createMenuItem(inventory, Material.SKULL_ITEM, "Create NPC", Arrays.asList("Create a new NPC."), 4 + 8, "npc_create");
+		createMenuItem(inventory, Material.BOOK_AND_QUILL, "Edit NPC", Arrays.asList("Edit existing NPCs."), 6 + 8, "npc_edit");
+		
+		return inventory;
+	}
+	
+	public static MenuInventory createNpcCreateMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("Create NPC", "npc_create_menu", p);
+		
+		
+		
+		return inventory;
+	}
+	
+	public static MenuInventory createNpcEditMenu(HangoutPlayer p){
+		MenuInventory inventory = createMenu("Edit NPC", "npc_edit_menu", p);
+		
+		int pos = 0;
+		for(NPCData d : NPCManager.getNPCData()){
+			createNPCMenuItem(d, inventory, pos);
+			pos++;
+		}
+		
+		return inventory;
+	}
+	
+	private static void createNPCMenuItem(NPCData d, MenuInventory inventory, int pos){
+		createMenuItem(inventory, Material.SKULL_ITEM, d.getName(), Arrays.asList(d.getSubtitle()), pos, "npc_data_"+d.getName());
+	}
+	
+	
 }

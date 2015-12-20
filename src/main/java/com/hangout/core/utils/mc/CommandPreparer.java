@@ -14,11 +14,24 @@ public class CommandPreparer {
 	private List<String> parts = new ArrayList<String>();
 	private String tag;
 	private int key;
+	private int stage = 0;
 	
 	public CommandPreparer(HangoutPlayer p, String tag, int key){
 		this.p = p;
 		this.tag = tag;
 		this.key = key;
+	}
+	
+	public String getTag(){
+		return tag;
+	}
+	
+	public int getStage(){
+		return stage;
+	}
+	
+	public void nextStage(){
+		stage++;
 	}
 	
 	public void append(String s){

@@ -102,4 +102,11 @@ public class ChatManager {
 			.send(otherP.getPlayer());
 		}
 	}
+	
+	public static void sendServerMessage(String s){
+		ChatChannel c = ChatManager.getChannel("core", "system");
+		for(Player online : Bukkit.getOnlinePlayers()){
+			online.sendMessage(c.getDisplayName() + ChatColor.WHITE + ChatColor.BOLD + " > " + ChatColor.GRAY + s);
+		}
+	}
 }

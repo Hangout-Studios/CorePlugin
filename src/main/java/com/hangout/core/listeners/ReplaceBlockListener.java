@@ -23,10 +23,13 @@ public class ReplaceBlockListener implements Listener {
 		
 		for(ItemStack item : b.getDrops(e.getPlayer().getItemInHand())){
 			CustomItem i = CustomItemManager.getDefaultItem(item.getType());
-			if(i == null) continue;
-			ItemStack newItem = i.getItemStack();
-			newItem.setAmount(item.getAmount());
-			b.getLocation().getWorld().dropItemNaturally(b.getLocation(), newItem);
+			if(i != null){
+				ItemStack newItem = i.getItemStack();
+				newItem.setAmount(item.getAmount());
+				b.getLocation().getWorld().dropItemNaturally(b.getLocation(), newItem);
+			}else{
+				b.getLocation().getWorld().dropItemNaturally(b.getLocation(), item);
+			}
 		}
 		
 		b.setType(Material.AIR);
